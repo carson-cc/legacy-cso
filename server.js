@@ -85,6 +85,21 @@ app.post('/apollo/enrich', async (req, res) => {
   }
 });
 
+app.get('/hunter/domain', async (req, res) => {
+  try {
+    const key = (req.headers['x-hunter-key'] || '').trim();
+    const domain = req.query.domain || '';
+    const limit = req.query.limit || 5;
+    const url = 'https://api.hunter.io/v2/domain-search?api_key=' + key + '&domain=' + encodeURIComponent(domain) + '&limit=' + limit;
+    const response = await fetch(url);
+    const rawText = await response.text();
+    try { res.json(JSON.parse(rawText)); }
+    catch(e) { res.json({ error: rawText, data: null }); }
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.get('/hunter/account', async (req, res) => {
   try {
     const response = await fetch('https://api.hunter.io/v2/account?api_key=' + req.headers['x-hunter-key']);
