@@ -121,31 +121,39 @@ app.post('/scrape-email', async (req, res) => {
   }
 });
 
-// Gmail send via SMTP (nodemailer + Gmail App Password)
+// Email send via SendGrid
 app.post('/gmail/send', async (req, res) => {
   try {
-    const { to, subject, body, gmailUser, gmailAppPassword } = req.body;
-    const nodemailer = require('nodemailer');
+    const { to, subject, body, gmailUser, sendgridKey } = req.body;
+    const apiKey = sendgridKey || process.env.SENDGRID_API_KEY;
     
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: gmailUser,
-        pass: gmailAppPassword
-      }
+    console.log('SendGrid send to:', to, '| subject:', subject);
+    
+    const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + apiKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: to }] }],
+        from: { email: gmailUser || 'carson@staffwithlegacy.com', name: 'Carson' },
+        reply_to: { email: gmailUser || 'carson@staffwithlegacy.com', name: 'Carson' },
+        subject: subject,
+        content: [{ type: 'text/plain', value: body }]
+      })
     });
 
-    const info = await transporter.sendMail({
-      from: '"Carson" <' + gmailUser + '>',
-      to: to,
-      subject: subject,
-      text: body
-    });
-
-    console.log('Gmail sent:', info.messageId, 'to:', to);
-    res.json({ success: true, messageId: info.messageId });
+    console.log('SendGrid status:', response.status);
+    if (response.status === 202) {
+      res.json({ success: true, messageId: 'sg-' + Date.now() });
+    } else {
+      const err = await response.text();
+      console.log('SendGrid error:', err);
+      res.json({ success: false, error: err, status: response.status });
+    }
   } catch (e) {
-    console.log('Gmail send error:', e.message);
+    console.log('SendGrid error:', e.message);
     res.status(500).json({ success: false, error: e.message });
   }
 });
