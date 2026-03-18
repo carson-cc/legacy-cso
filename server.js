@@ -121,6 +121,35 @@ app.post('/scrape-email', async (req, res) => {
   }
 });
 
+// Gmail send via SMTP (nodemailer + Gmail App Password)
+app.post('/gmail/send', async (req, res) => {
+  try {
+    const { to, subject, body, gmailUser, gmailAppPassword } = req.body;
+    const nodemailer = require('nodemailer');
+    
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: gmailUser,
+        pass: gmailAppPassword
+      }
+    });
+
+    const info = await transporter.sendMail({
+      from: '"Carson" <' + gmailUser + '>',
+      to: to,
+      subject: subject,
+      text: body
+    });
+
+    console.log('Gmail sent:', info.messageId, 'to:', to);
+    res.json({ success: true, messageId: info.messageId });
+  } catch (e) {
+    console.log('Gmail send error:', e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'Legacy Workforce AI CSO' });
 });
