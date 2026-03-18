@@ -196,6 +196,25 @@ app.post('/apollo/enrich', async (req, res) => {
   }
 });
 
+// Bulk enrich — reveal emails for up to 10 people by Apollo ID
+app.post('/apollo/bulk-enrich', async (req, res) => {
+  try {
+    const apolloKey = (req.headers['x-apollo-key'] || '').trim();
+    const { details } = req.body;
+    console.log('Bulk enrich:', details ? details.length : 0, 'people');
+    const response = await fetch('https://api.apollo.io/api/v1/people/bulk_match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache', 'X-Api-Key': apolloKey },
+      body: JSON.stringify({ details: details, reveal_personal_emails: false })
+    });
+    const rawText = await response.text();
+    console.log('Bulk enrich status:', response.status, '| preview:', rawText.substring(0, 150));
+    try { res.json(JSON.parse(rawText)); }
+    catch(e) { res.json({ error: rawText, matches: [] }); }
+  } catch (e) {
+    res.status(500).json({ error: e.message, matches: [] });
+  }
+});
 app.get('/hunter/domain', async (req, res) => {
   try {
     const key = (req.headers['x-hunter-key'] || '').trim();
