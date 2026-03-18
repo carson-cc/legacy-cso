@@ -46,13 +46,26 @@ app.get('/apollo/health', async (req, res) => {
 
 app.post('/apollo/search', async (req, res) => {
   try {
+    const apolloKey = (req.headers['x-apollo-key'] || '').trim();
+    console.log('Apollo key length:', apolloKey.length, '| first 8:', apolloKey.substring(0, 8));
     const response = await fetch('https://api.apollo.io/api/v1/mixed_people/api_search', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Api-Key': req.headers['x-apollo-key'] },
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+        'X-Api-Key': apolloKey
+      },
       body: JSON.stringify(req.body)
     });
-    const data = await response.json();
-    res.json(data);
+    const rawText = await response.text();
+    console.log('Apollo status:', response.status, '| preview:', rawText.substring(0, 120));
+    try {
+      const data = JSON.parse(rawText);
+      res.json(data);
+    } catch (parseErr) {
+      // Apollo returned non-JSON (e.g. "Invalid access token")
+      res.json({ error: rawText, people: [], total_entries: 0 });
+    }
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
