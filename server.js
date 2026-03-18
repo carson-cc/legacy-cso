@@ -10,6 +10,117 @@ app.use((req, res, next) => {
   next();
 });
 
+
+app.post('/scrape/email', async (req, res) => {
+  try {
+    const { company, domain } = req.body;
+    // Try common domain patterns
+    const cleanName = company.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+(inc|llc|corp|co|company|group|services|contracting|construction|electric|mechanical|hvac|plumbing|roofing|supply)\s*$/i, '')
+      .trim()
+      .replace(/\s+/g, '');
+    const domains = domain ? [domain] : [
+      cleanName + '.com',
+      cleanName + 'hvac.com', 
+      cleanName + 'plumbing.com',
+      cleanName + 'electric.com',
+      cleanName + 'construction.com',
+    ];
+    
+    for (const d of domains.slice(0, 3)) {
+      try {
+        const r = await fetch('https://' + d, {
+          signal: AbortSignal.timeout(5000),
+          headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+        const html = await r.text();
+        // Extract emails from page
+        const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+        const found = [...new Set(html.match(emailRegex) || [])];
+        // Filter out noreply, info spam, image files
+        const clean = found.filter(e => 
+          !e.includes('noreply') && 
+          !e.includes('.png') && 
+          !e.includes('.jpg') &&
+          !e.includes('example.com') &&
+          !e.includes('sentry') &&
+          !e.includes('wix') &&
+          e.length < 60
+        );
+        if (clean.length > 0) {
+          return res.json({ email: clean[0], domain: d, all: clean.slice(0, 5) });
+        }
+      } catch(e) { continue; }
+    }
+    res.json({ email: null });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/scrape-email', async (req, res) => {
+  try {
+    const { company, domain } = req.body;
+    const searchQuery = encodeURIComponent(company + ' contact email');
+    
+    // Try common email patterns on company domain
+    const emailsFound = [];
+    
+    if (domain) {
+      // Try fetching contact page
+      const urls = [
+        'https://' + domain + '/contact',
+        'https://' + domain + '/contact-us', 
+        'https://' + domain + '/about',
+        'https://' + domain
+      ];
+      
+      for (const url of urls) {
+        try {
+          const response = await fetch(url, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; business inquiry)' },
+            signal: AbortSignal.timeout(5000)
+          });
+          if (!response.ok) continue;
+          const html = await response.text();
+          
+          // Extract emails from page
+          const emailRegex = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+          const found = html.match(emailRegex) || [];
+          
+          // Filter out generic/spam emails
+          const filtered = found.filter(e => 
+            !e.includes('example.') &&
+            !e.includes('youremail') &&
+            !e.includes('email@') &&
+            !e.includes('@sentry') &&
+            !e.includes('@google') &&
+            !e.includes('@adobe') &&
+            !e.includes('.png') &&
+            !e.includes('.jpg') &&
+            e.split('@')[1].includes('.')
+          );
+          
+          if (filtered.length > 0) {
+            // Prefer non-generic emails (info@, contact@ less preferred than name@)
+            const personal = filtered.find(e => {
+              const local = e.split('@')[0].toLowerCase();
+              return !['info','contact','hello','admin','sales','support','team','office','mail'].includes(local);
+            });
+            emailsFound.push(...(personal ? [personal] : filtered.slice(0,1)));
+            break;
+          }
+        } catch(e) { continue; }
+      }
+    }
+    
+    res.json({ emails: emailsFound, found: emailsFound.length > 0 });
+  } catch (e) {
+    res.status(500).json({ error: e.message, emails: [] });
+  }
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'Legacy Workforce AI CSO' });
 });
