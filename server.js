@@ -142,18 +142,18 @@ app.post('/cron/process', async (req, res) => {
       let subject = '', body = '';
       if (item.type === 'calendly_no_book') {
         subject = 'Re: ' + (item.subject || 'connecting');
-        body = firstName + ', wanted to follow up — looks like you had a chance to check us out. Happy to keep it to 15 minutes. reply to this email and we can find a time\n\n' + CALENDLY_URL + '\n\nCarson · Legacy Workforce · staffwithlegacy.com' + CANSPAM_FOOTER;
+        body = firstName + ', wanted to follow up — looks like you had a chance to check us out. Happy to keep it to 15 minutes. worth 15 minutes -- no pitch, just want to understand what you are working with\n\n' + CALENDLY_URL + '\n\nCarson · Legacy Workforce · staffwithlegacy.com' + CANSPAM_FOOTER;
       } else if (item.type === 'booking_confirm') {
         subject = 'Looking forward to our call';
         body = firstName + ', confirmed — looking forward to our conversation.\n\nTo make it worthwhile, a couple quick questions beforehand:\n1. What role are you trying to fill right now?\n2. How long has it been open?\n\nFeel free to reply here or just bring it to the call.\n\nCarson · Legacy Workforce · staffwithlegacy.com';
       } else if (item.type === 'day3') {
-        const prompt = 'Write a 3-sentence follow-up cold email for Legacy Workforce (trades staffing). Prospect: ' + (item.name||'') + ' at ' + (item.org||'a trades company') + '. Day 3 — no reply yet. Angle: 3-month replacement guarantee removes all hiring risk, and we source through veteran transition programs. Start with their first name only. No questions. Soft close. Sign off: Carson';
+        const prompt = 'Write a 3-sentence follow-up cold email for Legacy Workforce (trades staffing). Prospect: ' + (item.name||'') + ' at ' + (item.org||'a trades company') + '. Write a 2-sentence Day 3 follow-up for Legacy Workforce. Prospect: '+item.name+' at '+item.org+'. Lead with one new piece of information they did not see in the first email: we source through veteran transition programs giving access to disciplined candidates most contractors never see. Second sentence: our 3-month replacement guarantee means zero financial risk. No pitch language. No questions. Start with their first name only. End with: Worth 15 minutes? Sign off: Carson';
         const aiRes = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 200, messages: [{ role: 'user', content: prompt }] }) });
         const aiData = await aiRes.json();
         body = (aiData.content?.[0]?.text || '') + '\n\n' + CALENDLY_URL + '\n\nCarson · Legacy Workforce · staffwithlegacy.com' + CANSPAM_FOOTER;
         subject = 'Re: ' + (item.subject || 'skilled trades hiring');
       } else if (item.type === 'day7') {
-        const prompt = 'Write a 2-sentence final follow-up for Legacy Workforce. Prospect: ' + (item.name||'') + ' at ' + (item.org||'a trades company') + '. Last note — Liberty University and trade school pipeline gives access to trained candidates not on any job board. Graceful, no pressure. Sign off: Carson';
+        const prompt = 'Write a 2-sentence final follow-up for Legacy Workforce. Prospect: ' + (item.name||'') + ' at ' + (item.org||'a trades company') + '. This is the last email. Start with: Last note from me. Lead with: direct pipeline from Liberty University and trade school partners means assessed candidates not on any job board. Keep it graceful and low pressure. End with: worth 15 minutes -- if not, I will leave you alone. Sign off: Carson';
         const aiRes = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 150, messages: [{ role: 'user', content: prompt }] }) });
         const aiData = await aiRes.json();
         body = (aiData.content?.[0]?.text || '') + '\n\n' + CALENDLY_URL + '\n\nCarson · Legacy Workforce · staffwithlegacy.com' + CANSPAM_FOOTER;
