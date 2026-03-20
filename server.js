@@ -16,7 +16,7 @@ const SENDGRID_KEY = process.env.SENDGRID_API_KEY;
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
 const APOLLO_KEY = process.env.APOLLO_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL || 'carson@staffwithlegacy.com';
-const CALENDLY_URL = 'https://calendly.com/carson-staffwithlegacy/30min';
+const CALENDLY_URL = 'https://calendly.com/carson-staffwithlegacy/15min';
 const CRON_SECRET = process.env.CRON_KEY || 'legacy-cron-2024';
 const CANSPAM_FOOTER = '\n\n---\nLegacy Workforce · 5730 Anita St, Dallas TX 75206\nUnsubscribe: reply STOP';
 
@@ -400,7 +400,6 @@ app.get('/sendgrid/stats', async (req, res) => {
   }
 });
 
-app.get('/health'
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'Legacy Workforce AI CSO', env: { sendgrid: !!SENDGRID_KEY, anthropic: !!ANTHROPIC_KEY, apollo: !!APOLLO_KEY } }));
 
 const PORT = process.env.PORT || 3000;
