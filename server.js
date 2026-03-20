@@ -142,7 +142,7 @@ app.post('/cron/process', async (req, res) => {
       let subject = '', body = '';
       if (item.type === 'calendly_no_book') {
         subject = 'Re: ' + (item.subject || 'connecting');
-        body = firstName + ', wanted to follow up — looks like you had a chance to check us out. Happy to keep it to 15 minutes. Thursday or Friday work this week?\n\n' + CALENDLY_URL + '\n\nCarson · Legacy Workforce · staffwithlegacy.com' + CANSPAM_FOOTER;
+        body = firstName + ', wanted to follow up — looks like you had a chance to check us out. Happy to keep it to 15 minutes. reply to this email and we can find a time\n\n' + CALENDLY_URL + '\n\nCarson · Legacy Workforce · staffwithlegacy.com' + CANSPAM_FOOTER;
       } else if (item.type === 'booking_confirm') {
         subject = 'Looking forward to our call';
         body = firstName + ', confirmed — looking forward to our conversation.\n\nTo make it worthwhile, a couple quick questions beforehand:\n1. What role are you trying to fill right now?\n2. How long has it been open?\n\nFeel free to reply here or just bring it to the call.\n\nCarson · Legacy Workforce · staffwithlegacy.com';
