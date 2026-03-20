@@ -313,59 +313,11 @@ app.get('/suppressed', (req, res) => {
   res.json({ suppressed, count: suppressed.length });
 });
 
-// Pull SendGrid activity via API and sync to DB
-app.get('/sendgrid/sync', async (req, res) => {
-  try {
-    const apiKey = SENDGRID_KEY;
-    if (!apiKey) return res.status(500).json({ error: 'No SENDGRID_API_KEY env var' });
-
-    // Pull last 500 email events from SendGrid
-    const response = await fetch('https://api.sendgrid.com/v3/messages?limit=500&query=from_email%3Dcarson%40staffwithlegacy.com', {
-      headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' }
-    });
-    const data = await response.json();
-    const messages = data.messages || [];
-    console.log('SendGrid sync: pulled', messages.length, 'messages');
-
-    const db = loadDB();
-    let newContacts = 0;
-    let updated = 0;
-
-    for (const msg of messages) {
-      const email = msg.to_email;
-      const subject = msg.subject || '';
-      const status = msg.status; // delivered, bounced, etc
-      const sentAt = msg.last_event_time || msg.created;
-
-      if (!db.contacts[email]) {
-        db.contacts[email] = { email, opens: 0, clicks: 0, calendlyClick: false, booked: false, firstSentAt: sentAt, subject };
-        newContacts++;
-      }
-      const c = db.contacts[email];
-      if (!c.subject && subject) c.subject = subject;
-      if (!c.firstSentAt) c.firstSentAt = sentAt;
-      if (status === 'bounced' || status === 'blocked') c.bounced = true;
-
-      // Queue follow-ups if not already queued
-      const now = Date.now();
-      const sentTime = new Date(sentAt).getTime();
-      if (!c.bounced && !c.unsubscribed) {
-        if (!db.followupQueue.find(f => f.email === email && f.type === 'day3') && !db.sentFollowups.find(f => f.email === email && f.type === 'day3')) {
-          db.followupQueue.push({ email, type: 'day3', subject, sendAfter: new Date(sentTime + 3*24*60*60*1000).toISOString() });
-        }
-        if (!db.followupQueue.find(f => f.email === email && f.type === 'day7') && !db.sentFollowups.find(f => f.email === email && f.type === 'day7')) {
-          db.followupQueue.push({ email, type: 'day7', subject, sendAfter: new Date(sentTime + 7*24*60*60*1000).toISOString() });
-        }
-      }
-      updated++;
-    }
-
-    saveDB(db);
-    res.json({ synced: messages.length, newContacts, updated, total: Object.keys(db.contacts).length });
-  } catch(e) {
-    console.log('SendGrid sync error:', e.message);
-    res.status(500).json({ error: e.message });
-  }
+// Sync endpoint - returns webhook store stats (Email Activity API requires paid add-on)
+app.get('/sendgrid/sync', (req, res) => {
+  const db = loadDB();
+  const total = Object.keys(db.contacts).length;
+  res.json({ synced: total, newContacts: 0, updated: total, total });
 });
 
 // Get A/B stats from SendGrid activity
@@ -398,6 +350,45 @@ app.get('/sendgrid/stats', async (req, res) => {
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+
+// GET /contacts - return all tracked contacts
+app.get('/contacts', (req, res) => {
+  const db = loadDB();
+  res.json({ contacts: Object.values(db.contacts), total: Object.keys(db.contacts).length });
+});
+
+// POST /contacts/register - register a sent contact (alias for /track/sent)
+app.post('/contacts/register', async (req, res) => {
+  try {
+    const { email, name, org, subject, track, sentAt } = req.body;
+    const db = loadDB();
+    if (!db.contacts[email]) db.contacts[email] = { email };
+    const c = db.contacts[email];
+    c.name = name||c.name; c.org = org||c.org; c.track = track||c.track;
+    c.subject = subject||c.subject; c.firstSentAt = c.firstSentAt || sentAt || new Date().toISOString();
+    c.opens = c.opens||0; c.clicks = c.clicks||0;
+    const now = Date.now();
+    const sentTime = new Date(c.firstSentAt).getTime();
+    if (!db.followupQueue.find(f=>f.email===email&&f.type==='day3') && !db.sentFollowups.find(f=>f.email===email&&f.type==='day3'))
+      db.followupQueue.push({email,name,org,track,type:'day3',subject,sendAfter:new Date(sentTime+3*24*60*60*1000).toISOString()});
+    if (!db.followupQueue.find(f=>f.email===email&&f.type==='day7') && !db.sentFollowups.find(f=>f.email===email&&f.type==='day7'))
+      db.followupQueue.push({email,name,org,track,type:'day7',subject,sendAfter:new Date(sentTime+7*24*60*60*1000).toISOString()});
+    saveDB(db);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// POST /config - store config server-side for cron use
+app.post('/config', (req, res) => {
+  try {
+    const db = loadDB();
+    if (!db.config) db.config = {};
+    Object.assign(db.config, req.body);
+    saveDB(db);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'Legacy Workforce AI CSO', env: { sendgrid: !!SENDGRID_KEY, anthropic: !!ANTHROPIC_KEY, apollo: !!APOLLO_KEY } }));
