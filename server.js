@@ -313,6 +313,94 @@ app.get('/suppressed', (req, res) => {
   res.json({ suppressed, count: suppressed.length });
 });
 
+// Pull SendGrid activity via API and sync to DB
+app.get('/sendgrid/sync', async (req, res) => {
+  try {
+    const apiKey = SENDGRID_KEY;
+    if (!apiKey) return res.status(500).json({ error: 'No SENDGRID_API_KEY env var' });
+
+    // Pull last 500 email events from SendGrid
+    const response = await fetch('https://api.sendgrid.com/v3/messages?limit=500&query=from_email%3Dcarson%40staffwithlegacy.com', {
+      headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' }
+    });
+    const data = await response.json();
+    const messages = data.messages || [];
+    console.log('SendGrid sync: pulled', messages.length, 'messages');
+
+    const db = loadDB();
+    let newContacts = 0;
+    let updated = 0;
+
+    for (const msg of messages) {
+      const email = msg.to_email;
+      const subject = msg.subject || '';
+      const status = msg.status; // delivered, bounced, etc
+      const sentAt = msg.last_event_time || msg.created;
+
+      if (!db.contacts[email]) {
+        db.contacts[email] = { email, opens: 0, clicks: 0, calendlyClick: false, booked: false, firstSentAt: sentAt, subject };
+        newContacts++;
+      }
+      const c = db.contacts[email];
+      if (!c.subject && subject) c.subject = subject;
+      if (!c.firstSentAt) c.firstSentAt = sentAt;
+      if (status === 'bounced' || status === 'blocked') c.bounced = true;
+
+      // Queue follow-ups if not already queued
+      const now = Date.now();
+      const sentTime = new Date(sentAt).getTime();
+      if (!c.bounced && !c.unsubscribed) {
+        if (!db.followupQueue.find(f => f.email === email && f.type === 'day3') && !db.sentFollowups.find(f => f.email === email && f.type === 'day3')) {
+          db.followupQueue.push({ email, type: 'day3', subject, sendAfter: new Date(sentTime + 3*24*60*60*1000).toISOString() });
+        }
+        if (!db.followupQueue.find(f => f.email === email && f.type === 'day7') && !db.sentFollowups.find(f => f.email === email && f.type === 'day7')) {
+          db.followupQueue.push({ email, type: 'day7', subject, sendAfter: new Date(sentTime + 7*24*60*60*1000).toISOString() });
+        }
+      }
+      updated++;
+    }
+
+    saveDB(db);
+    res.json({ synced: messages.length, newContacts, updated, total: Object.keys(db.contacts).length });
+  } catch(e) {
+    console.log('SendGrid sync error:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Get A/B stats from SendGrid activity
+app.get('/sendgrid/stats', async (req, res) => {
+  try {
+    const apiKey = SENDGRID_KEY;
+    if (!apiKey) return res.status(500).json({ error: 'No SENDGRID_API_KEY' });
+
+    const db = loadDB();
+    const contacts = Object.values(db.contacts);
+    const total = contacts.length;
+    const delivered = contacts.filter(c => !c.bounced).length;
+    const opens = contacts.filter(c => c.opens > 0).length;
+    const clicks = contacts.filter(c => c.clicks > 0).length;
+    const calendlyClicks = contacts.filter(c => c.calendlyClick).length;
+    const booked = contacts.filter(c => c.booked).length;
+    const bounced = contacts.filter(c => c.bounced).length;
+    const unsubscribed = contacts.filter(c => c.unsubscribed).length;
+    const followupsPending = db.followupQueue.length;
+    const followupsSent = db.sentFollowups.length;
+
+    res.json({
+      total, delivered, bounced, unsubscribed,
+      opens, openRate: delivered > 0 ? Math.round(opens/delivered*100) : 0,
+      clicks, clickRate: delivered > 0 ? Math.round(clicks/delivered*100) : 0,
+      calendlyClicks, calendlyRate: delivered > 0 ? Math.round(calendlyClicks/delivered*100) : 0,
+      booked, followupsPending, followupsSent,
+      contacts: db.contacts
+    });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/health'
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'Legacy Workforce AI CSO', env: { sendgrid: !!SENDGRID_KEY, anthropic: !!ANTHROPIC_KEY, apollo: !!APOLLO_KEY } }));
 
 const PORT = process.env.PORT || 3000;
