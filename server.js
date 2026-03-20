@@ -53,6 +53,13 @@ app.post('/webhook/sendgrid', async (req, res) => {
         }
       }
       if (type === 'bounce' || type === 'spamreport') { c.bounced = true; }
+      if (type === 'unsubscribe' || type === 'group_unsubscribe') {
+        c.unsubscribed = true;
+        c.unsubscribedAt = ts;
+        // Remove all pending follow-ups for this person
+        db.followupQueue = db.followupQueue.filter(f => f.email !== email);
+        console.log('UNSUBSCRIBED:', email, '-- all follow-ups cancelled');
+      }
       // Queue calendly-click-no-book follow-up (24 hours)
       const alreadyQueued = db.followupQueue.find(f => f.email === email && f.type === 'calendly_no_book');
       const alreadySent = db.sentFollowups.find(f => f.email === email && f.type === 'calendly_no_book');
@@ -126,7 +133,11 @@ app.post('/cron/process', async (req, res) => {
     try {
       const contact = db.contacts[item.email] || {};
       if (contact.booked) { db.followupQueue = db.followupQueue.filter(f => !(f.email===item.email && f.type===item.type)); continue; }
-      if (contact.bounced) { db.followupQueue = db.followupQueue.filter(f => f.email !== item.email); continue; }
+      if (contact.bounced || contact.unsubscribed) {
+        db.followupQueue = db.followupQueue.filter(f => f.email !== item.email);
+        console.log('Skipping', item.email, '-- bounced or unsubscribed');
+        continue;
+      }
       const firstName = (item.name || item.email.split('@')[0]).split(' ')[0];
       let subject = '', body = '';
       if (item.type === 'calendly_no_book') {
@@ -292,6 +303,14 @@ app.post('/scrape-email', async (req, res) => {
     }
     res.json({ emails: emailsFound, found: emailsFound.length > 0 });
   } catch(e) { res.status(500).json({ error: e.message, emails: [] }); }
+});
+
+app.get('/suppressed', (req, res) => {
+  const db = loadDB();
+  const suppressed = Object.values(db.contacts)
+    .filter(c => c.bounced || c.unsubscribed)
+    .map(c => ({ email: c.email, reason: c.unsubscribed ? 'unsubscribed' : 'bounced', at: c.unsubscribedAt || c.firstSentAt }));
+  res.json({ suppressed, count: suppressed.length });
 });
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'Legacy Workforce AI CSO', env: { sendgrid: !!SENDGRID_KEY, anthropic: !!ANTHROPIC_KEY, apollo: !!APOLLO_KEY } }));
