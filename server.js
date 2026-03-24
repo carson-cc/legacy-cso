@@ -163,6 +163,11 @@ app.post('/cron/process', async (req, res) => {
     try {
       const contact = db.contacts[item.email] || {};
       if (contact.booked) { db.followupQueue = db.followupQueue.filter(f => !(f.email===item.email && f.type===item.type)); continue; }
+      if (item.email === 'dduvall@rffager.com' || item.email === 'csyenrick@smithphillips.net') {
+        console.log('Skipping wrong ICP:', item.email);
+        db.followupQueue = db.followupQueue.filter(f => f.email !== item.email);
+        continue;
+      }
       if (contact.bounced || contact.unsubscribed) {
         db.followupQueue = db.followupQueue.filter(f => f.email !== item.email);
         console.log('Skipping', item.email, '-- bounced or unsubscribed');
