@@ -337,10 +337,34 @@ app.post('/scrape-email', async (req, res) => {
 
 app.get('/suppressed', async (req, res) => {
   const db = await loadDB();
-  const suppressed = Object.values(db.contacts)
-    .filter(c => c.bounced || c.unsubscribed)
-    .map(c => ({ email: c.email, reason: c.unsubscribed ? 'unsubscribed' : 'bounced', at: c.unsubscribedAt || c.firstSentAt }));
-  res.json({ suppressed, count: suppressed.length });
+  const apiKey = SENDGRID_KEY;
+  let sgSuppressions = [];
+  if (apiKey) {
+    try {
+      const [unsubRes, bounceRes, spamRes] = await Promise.all([
+        fetch('https://api.sendgrid.com/v3/suppression/unsubscribes?limit=500', { headers: { 'Authorization': 'Bearer ' + apiKey } }),
+        fetch('https://api.sendgrid.com/v3/suppression/bounces?limit=500', { headers: { 'Authorization': 'Bearer ' + apiKey } }),
+        fetch('https://api.sendgrid.com/v3/suppression/spam_reports?limit=500', { headers: { 'Authorization': 'Bearer ' + apiKey } })
+      ]);
+      const [unsubData, bounceData, spamData] = await Promise.all([unsubRes.json(), bounceRes.json(), spamRes.json()]);
+      const process = (arr, reason) => Array.isArray(arr) ? arr.forEach(x => {
+        sgSuppressions.push({ email: x.email, reason, at: new Date(x.created * 1000).toISOString() });
+        if (!db.contacts[x.email]) db.contacts[x.email] = { email: x.email, opens: 0, clicks: 0 };
+        if (reason === 'unsubscribed' || reason === 'spam') { db.contacts[x.email].unsubscribed = true; db.contacts[x.email].unsubscribedAt = new Date(x.created * 1000).toISOString(); }
+        if (reason === 'bounced') db.contacts[x.email].bounced = true;
+        db.followupQueue = db.followupQueue.filter(f => f.email !== x.email);
+      }) : null;
+      process(unsubData, 'unsubscribed');
+      process(bounceData, 'bounced');
+      process(spamData, 'spam');
+      if (sgSuppressions.length) await saveDB(db);
+      console.log('SendGrid suppressions:', sgSuppressions.length);
+    } catch(e) { console.log('SG suppression error:', e.message); }
+  }
+  const local = Object.values(db.contacts).filter(c => c.bounced || c.unsubscribed).map(c => ({ email: c.email, reason: c.unsubscribed ? 'unsubscribed' : 'bounced', at: c.unsubscribedAt || c.firstSentAt }));
+  const seen = new Set(local.map(x => x.email));
+  sgSuppressions.forEach(x => { if (!seen.has(x.email)) local.push(x); });
+  res.json({ suppressed: local, count: local.length, fromSendGrid: sgSuppressions.length });
 });
 
 // Sync endpoint - returns webhook store stats (Email Activity API requires paid add-on)
@@ -419,6 +443,44 @@ app.post('/config', async (req, res) => {
     await saveDB(db);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+
+// GET /sendgrid/clicks - analyze what the 22 clicks were
+// SendGrid free tier doesn't have full activity feed but we can check
+// suppressions and our webhook event store
+app.get('/sendgrid/clicks', async (req, res) => {
+  const db = await loadDB();
+  const apiKey = SENDGRID_KEY;
+
+  // Events from our webhook store
+  const clickEvents = db.events.filter(e => e.type === 'click');
+  const openEvents = db.events.filter(e => e.type === 'open');
+  const unsubEvents = db.events.filter(e => e.type === 'unsubscribe' || e.type === 'group_unsubscribe');
+  const bounceEvents = db.events.filter(e => e.type === 'bounce');
+
+  // Contacts with engagement
+  const engaged = Object.values(db.contacts).filter(c => c.clicks > 0 || c.opens > 0);
+
+  res.json({
+    summary: {
+      clicks: clickEvents.length,
+      opens: openEvents.length,
+      unsubscribes: unsubEvents.length,
+      bounces: bounceEvents.length,
+      engaged: engaged.length
+    },
+    clickEvents: clickEvents.slice(-50),
+    unsubscribeEvents: unsubEvents,
+    engagedContacts: engaged.map(c => ({
+      email: c.email,
+      opens: c.opens,
+      clicks: c.clicks,
+      calendlyClick: c.calendlyClick,
+      unsubscribed: c.unsubscribed || false,
+      bounced: c.bounced || false
+    }))
+  });
 });
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'Legacy Workforce AI CSO', env: { sendgrid: !!SENDGRID_KEY, anthropic: !!ANTHROPIC_KEY, apollo: !!APOLLO_KEY } }));
