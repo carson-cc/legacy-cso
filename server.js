@@ -18,6 +18,19 @@ const APOLLO_KEY = process.env.APOLLO_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL || 'carson@staffwithlegacy.com';
 const CALENDLY_URL = 'https://calendly.com/carson-staffwithlegacy/15-minute-meeting';
 const CRON_SECRET = process.env.CRON_KEY || 'legacy-cron-2024';
+function nextTwoBusinessDays() {
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const result = [];
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  while (result.length < 2) {
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) result.push(days[dow]);
+    if (result.length < 2) d.setDate(d.getDate() + 1);
+  }
+  return result[0] + ' or ' + result[1];
+}
+
 const CANSPAM_FOOTER = '\n\n---\nLegacy Workforce · 5730 Anita St, Dallas TX 75206\nUnsubscribe: reply STOP';
 
 // ── PERSISTENT STORAGE (Postgres with /tmp fallback) ────────────
@@ -161,6 +174,13 @@ app.post('/cron/process', async (req, res) => {
   const results = [];
   for (const item of due) {
     try {
+      // DEDUP: skip if already in sentFollowups
+      const alreadySent = db.sentFollowups.find(f => f.email === item.email && f.type === item.type);
+      if (alreadySent) {
+        console.log('DEDUP: already sent', item.type, 'to', item.email, '-- removing from queue');
+        db.followupQueue = db.followupQueue.filter(f => !(f.email===item.email && f.type===item.type));
+        continue;
+      }
       const contact = db.contacts[item.email] || {};
       if (contact.booked) { db.followupQueue = db.followupQueue.filter(f => !(f.email===item.email && f.type===item.type)); continue; }
       if (item.email === 'dduvall@rffager.com' || item.email === 'csyenrick@smithphillips.net') {
@@ -177,7 +197,7 @@ app.post('/cron/process', async (req, res) => {
       let subject = '', body = '';
       if (item.type === 'calendly_no_book') {
         subject = 'Re: ' + (item.subject || 'connecting');
-        body = firstName + ', wanted to follow up — looks like you had a chance to check us out. Happy to keep it to 15 minutes. worth 15 minutes -- no pitch, just want to understand what you are working with\n\n' + CALENDLY_URL + '\n\nCarson · Legacy Workforce · staffwithlegacy.com' + CANSPAM_FOOTER;
+        body = firstName + ', still worth 15 minutes -- want to understand what your hiring looks like going into Q2. ' + nextTwoBusinessDays() + ' work?\n\n' + CALENDLY_URL + '\n\nCarson · Legacy Workforce · staffwithlegacy.com' + CANSPAM_FOOTER;
       } else if (item.type === 'booking_confirm') {
         subject = 'Looking forward to our call';
         body = firstName + ', confirmed — looking forward to our conversation.\n\nTo make it worthwhile, a couple quick questions beforehand:\n1. What role are you trying to fill right now?\n2. How long has it been open?\n\nFeel free to reply here or just bring it to the call.\n\nCarson · Legacy Workforce · staffwithlegacy.com';
@@ -486,6 +506,87 @@ app.get('/sendgrid/clicks', async (req, res) => {
       bounced: c.bounced || false
     }))
   });
+});
+
+
+// ONE-TIME FIX: Re-register all contacts with correct original send dates
+app.post('/fix/requeue', async (req, res) => {
+  const key = req.headers['x-cron-key'] || req.body?.cronKey;
+  if (key !== CRON_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+
+  const contacts = [
+    {email:'liz@fixmyair.com',name:'Liz',org:'Fixmyair',subject:'OHA multi-trade hiring challenges',sentAt:'2026-03-18T21:25:00Z'},
+    {email:'cvittone@denronhall.com',name:'Chris',org:'Denron Hall',subject:'Denron Hall dual-trade hiring gaps',sentAt:'2026-03-18T21:29:00Z'},
+    {email:'smcleod@fields-fowler.com',name:'Scott',org:'Fields & Fowler',subject:'Fields & Fowler multi-trade hiring',sentAt:'2026-03-18T21:32:00Z'},
+    {email:'jcordrey@teamrri.com',name:'J. Cordrey',org:'Roofing Resources Inc.',subject:'Qualified roofers — Roofing Resources',sentAt:'2026-03-18T21:35:00Z'},
+    {email:'brianm@wcmechanical.com',name:'Brian',org:'WC Mechanical',subject:'72-hour HVAC techs for West Chester',sentAt:'2026-03-18T21:38:00Z'},
+    {email:'ssimon@hightechvac.com',name:'S. Simon',org:'HighTec HVAC',subject:'72-hour HVAC techs for HighTec',sentAt:'2026-03-18T21:41:00Z'},
+    {email:'nate@dullesplumbinggroup.com',name:'Nate',org:'Dulles Plumbing Group',subject:'Dulles Plumbing Group Northern VA sourcing',sentAt:'2026-03-18T21:44:00Z'},
+    {email:'jlc@jamescraftson.com',name:'J.L. Craftson',org:'James CRAFT & Son',subject:'James CRAFT & Son skilled craftspeople',sentAt:'2026-03-18T23:49:00Z'},
+    {email:'aggie.king@allamerican-nc.com',name:'Aggie',org:'All American Heating Air & Plumbing',subject:'All American multi-trade hiring gaps',sentAt:'2026-03-19T15:54:00Z'},
+    {email:'mhopkins@acmemechanical.com',name:'Matt',org:'Acme Mechanical Contractors',subject:'72-hour HVAC techs for Acme Mechanical',sentAt:'2026-03-19T15:51:00Z'},
+    {email:'j.harris@cenvarroofing.com',name:'Jeff',org:'Cenvar Roofing & Solar',subject:'Cenvar dual-skill roofer gaps',sentAt:'2026-03-19T15:57:00Z'},
+    {email:'allen@cenvarroofing.com',name:'Allen',org:'Cenvar Roofing & Solar',subject:'Cenvar dual-trade roofer gaps',sentAt:'2026-03-19T16:03:00Z'},
+    {email:'jhuttenlock@bestchoiceplumbing.net',name:'Jessica',org:'Best Choice Plumbing & Heating',subject:'Best Choice dual-trade hiring gaps',sentAt:'2026-03-19T16:00:00Z'},
+    {email:'jared.haas@ais-york.com',name:'Jared',org:'Advanced Industrial Services Inc.',subject:'AIS industrial maintenance staffing',sentAt:'2026-03-19T16:06:00Z'},
+    {email:'csantos@nvroofing.com',name:'Carolina',org:'NV Roofing',subject:'72-hour roofers for NV Roofing',sentAt:'2026-03-19T16:10:00Z'},
+    {email:'cal@handysideinc.com',name:'Carley',org:'Handyside Plumbing HVAC & Electrical',subject:'Handyside multi-trade hiring gaps',sentAt:'2026-03-19T16:14:00Z'},
+    {email:'michelle@karmacgroup.com',name:'Michelle',org:'Karma Construction Group',subject:'Karma Construction skilled trades gaps',sentAt:'2026-03-19T16:18:00Z'},
+    {email:'mark.trickey@comfortsystemsusa.com',name:'Mark',org:'Comfort Systems USA MidAtlantic',subject:'72-hour HVAC techs for Comfort Systems',sentAt:'2026-03-19T16:22:00Z'},
+    {email:'mark.sobon@centralmechanical.com',name:'Mark',org:'Central Mechanical Construction',subject:'72-hour pipefitters for Central Mechanical',sentAt:'2026-03-19T16:25:00Z'},
+    {email:'gmartin@serviceroofing.com',name:'Guy',org:'Tri-State Service Roofing',subject:'Tri-State multi-territory roofing staffing',sentAt:'2026-03-19T16:28:00Z'},
+    {email:'info@rapidfirerentals.com',name:'James',org:'RapidFire Rentals',subject:'RapidFire equipment operator gaps',sentAt:'2026-03-19T16:31:00Z'},
+    {email:'jrogers@fourquartersinc.com',name:'Jeremiah',org:'Four Quarters Mechanical',subject:'72-hour HVAC techs for Four Quarters',sentAt:'2026-03-19T16:34:00Z'},
+    {email:'daniel@airsolution.us',name:'Daniel',org:'Air Solution Mechanical Services',subject:'72-hour HVAC techs for Air Solution',sentAt:'2026-03-19T16:41:00Z'},
+    {email:'sean@superiorphm.com',name:'Sean',org:'Superior Plumbing Heating & Mechanical',subject:'Superior multi-trade technician gaps',sentAt:'2026-03-19T16:44:00Z'},
+    {email:'shanedonohue@everyonelovesbacon.com',name:'Shane',org:'Bacon Plumbing Heating Air & Electric',subject:'Bacon Plumbing multi-trade hiring',sentAt:'2026-03-19T16:48:00Z'},
+    {email:'rkillian@triangle-contractors.com',name:'Robbie',org:'Triangle Contractors LLC',subject:'Triangle Contractors multi-trade hiring',sentAt:'2026-03-19T18:26:00Z'},
+    {email:'rob.struhar@fourtwelvedev.com',name:'Rob',org:'Four Twelve Roofing',subject:'Qualified roofers — Four Twelve market',sentAt:'2026-03-19T18:30:00Z'},
+    {email:'dkatchmark@katchmark.com',name:'Denise',org:'Katchmark Construction Inc.',subject:'72-hour carpenters for Katchmark Construction',sentAt:'2026-03-20T21:03:00Z'},
+    {email:'ttacconelli@valiantenergyservice.com',name:'Thomas',org:'Valiant Energy Service LLC',subject:'Valiant Energy field tech gaps',sentAt:'2026-03-20T21:00:00Z'},
+  ];
+
+  const skip = ['dduvall@rffager.com','csyenrick@smithphillips.net'];
+  const db = await loadDB();
+
+  // Clear existing queue for these contacts
+  contacts.forEach(c => {
+    db.followupQueue = db.followupQueue.filter(f => f.email !== c.email);
+  });
+
+  const now = new Date();
+  let queued = 0;
+  let d3due = 0;
+
+  for (const c of contacts) {
+    if (skip.includes(c.email)) continue;
+    const sentTime = new Date(c.sentAt).getTime();
+    const d3Time = sentTime + 3*24*60*60*1000;
+    const d7Time = sentTime + 7*24*60*60*1000;
+    const alreadySentD3 = db.sentFollowups.find(f => f.email === c.email && f.type === 'day3');
+    const alreadySentD7 = db.sentFollowups.find(f => f.email === c.email && f.type === 'day7');
+
+    if (!db.contacts[c.email]) {
+      db.contacts[c.email] = { email: c.email, name: c.name, org: c.org, opens: 0, clicks: 0, firstSentAt: c.sentAt, subject: c.subject };
+    }
+
+    if (!alreadySentD3) {
+      // If overdue, queue for tomorrow 8am instead of past date
+      const sendD3 = d3Time < now.getTime() ? new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 8, 0, 0).toISOString() : new Date(d3Time).toISOString();
+      db.followupQueue.push({ email: c.email, name: c.name, org: c.org, type: 'day3', subject: c.subject, track: 'regional', sendAfter: sendD3 });
+      if (d3Time < now.getTime()) d3due++;
+      queued++;
+    }
+    if (!alreadySentD7) {
+      const sendD7 = new Date(d7Time).toISOString();
+      db.followupQueue.push({ email: c.email, name: c.name, org: c.org, type: 'day7', subject: c.subject, track: 'regional', sendAfter: sendD7 });
+      queued++;
+    }
+  }
+
+  await saveDB(db);
+  console.log('Requeue fix:', queued, 'follow-ups queued,', d3due, 'Day 3 rescheduled to tomorrow');
+  res.json({ success: true, queued, d3due, message: d3due + ' overdue Day 3 follow-ups scheduled for tomorrow 8am' });
 });
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'Legacy Workforce AI CSO', env: { sendgrid: !!SENDGRID_KEY, anthropic: !!ANTHROPIC_KEY, apollo: !!APOLLO_KEY } }));
