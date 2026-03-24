@@ -6,7 +6,7 @@ app.use(express.json());
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, X-Anthropic-Key, X-Apollo-Key, X-Hunter-Key, X-SendGrid-Key');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, X-Anthropic-Key, X-Apollo-Key, X-Hunter-Key, X-SendGrid-Key, X-Cron-Key, x-cron-key');
   if (req.method === 'OPTIONS') return res.sendStatus(200);
   next();
 });
@@ -164,8 +164,8 @@ app.post('/track/sent', async (req, res) => {
 
 // ── CRON PROCESSOR (hit by cron-job.org every morning 8am CT) ────
 app.post('/cron/process', async (req, res) => {
-  const key = req.headers['x-cron-key'] || req.body?.cronKey;
-  if (key !== CRON_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+  const key = req.headers['x-cron-key'] || req.headers['X-Cron-Key'] || req.body?.cronKey;
+  if (key !== CRON_SECRET) return res.status(401).json({ error: 'Unauthorized', received: key ? 'key present but wrong' : 'no key' });
   const db = await loadDB();
   const now = new Date();
   const due = db.followupQueue.filter(f => new Date(f.sendAfter) <= now);
