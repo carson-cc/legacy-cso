@@ -20,21 +20,51 @@ const CALENDLY_URL = 'https://calendly.com/carson-staffwithlegacy/15-minute-meet
 const CRON_SECRET = process.env.CRON_KEY || 'legacy-cron-2024';
 const CANSPAM_FOOTER = '\n\n---\nLegacy Workforce · 5730 Anita St, Dallas TX 75206\nUnsubscribe: reply STOP';
 
-// ── PERSISTENT STORAGE ────────────────────────────────────────────
+// ── PERSISTENT STORAGE (Postgres with /tmp fallback) ────────────
 const DB_FILE = '/tmp/legacy_events.json';
-function loadDB() {
+let pgClient = null;
+
+async function initDB() {
+  if (!process.env.DATABASE_URL) return;
+  try {
+    const { Client } = require('pg');
+    pgClient = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+    await pgClient.connect();
+    await pgClient.query(`CREATE TABLE IF NOT EXISTS store (key TEXT PRIMARY KEY, value TEXT, updated_at TIMESTAMPTZ DEFAULT NOW())`);
+    console.log('Postgres connected');
+  } catch(e) {
+    console.log('Postgres failed, using /tmp fallback:', e.message);
+    pgClient = null;
+  }
+}
+
+async function loadDB() {
+  if (pgClient) {
+    try {
+      const r = await pgClient.query(`SELECT value FROM store WHERE key = 'db'`);
+      if (r.rows.length) return JSON.parse(r.rows[0].value);
+    } catch(e) { console.log('Postgres read error:', e.message); }
+  }
   try { if (fs.existsSync(DB_FILE)) return JSON.parse(fs.readFileSync(DB_FILE, 'utf8')); } catch(e) {}
   return { events: [], contacts: {}, followupQueue: [], sentFollowups: [] };
 }
-function saveDB(db) {
-  try { fs.writeFileSync(DB_FILE, JSON.stringify(db), 'utf8'); } catch(e) {}
+
+async function saveDB(db) {
+  const json = JSON.stringify(db);
+  if (pgClient) {
+    try {
+      await pgClient.query(`INSERT INTO store (key, value, updated_at) VALUES ('db', $1, NOW()) ON CONFLICT (key) DO UPDATE SET value = $1, updated_at = NOW()`, [json]);
+      return;
+    } catch(e) { console.log('Postgres write error:', e.message); }
+  }
+  try { fs.writeFileSync(DB_FILE, json, 'utf8'); } catch(e) {}
 }
 
 // ── SENDGRID WEBHOOK ──────────────────────────────────────────────
 app.post('/webhook/sendgrid', async (req, res) => {
   try {
     const events = Array.isArray(req.body) ? req.body : [req.body];
-    const db = loadDB();
+    const db = await loadDB();
     for (const event of events) {
       const email = event.email;
       const type = event.event;
@@ -68,7 +98,7 @@ app.post('/webhook/sendgrid', async (req, res) => {
         console.log('Queued calendly follow-up for:', email);
       }
     }
-    saveDB(db);
+    await saveDB(db);
     res.status(200).json({ received: events.length });
   } catch(e) { console.log('Webhook error:', e.message); res.status(200).json({ error: e.message }); }
 });
@@ -84,7 +114,7 @@ app.post('/webhook/calendly', async (req, res) => {
     const startTime = payload.payload?.event?.start_time || '';
     console.log('Calendly webhook:', event, email, startTime);
     if (email && (event === 'invitee.created' || event.includes('created'))) {
-      const db = loadDB();
+      const db = await loadDB();
       if (!db.contacts[email]) db.contacts[email] = { email };
       db.contacts[email].booked = true;
       db.contacts[email].bookedAt = new Date().toISOString();
@@ -92,7 +122,7 @@ app.post('/webhook/calendly', async (req, res) => {
       db.contacts[email].name = name;
       db.followupQueue = db.followupQueue.filter(f => !(f.email === email && f.type === 'calendly_no_book'));
       db.followupQueue.push({ email, type: 'booking_confirm', sendAfter: new Date().toISOString(), name, meetingTime: startTime });
-      saveDB(db);
+      await saveDB(db);
       console.log('Booking confirmed:', email, startTime);
     }
     res.status(200).json({ received: true });
@@ -103,7 +133,7 @@ app.post('/webhook/calendly', async (req, res) => {
 app.post('/track/sent', async (req, res) => {
   try {
     const { email, name, org, subject, track } = req.body;
-    const db = loadDB();
+    const db = await loadDB();
     if (!db.contacts[email]) db.contacts[email] = { email };
     const c = db.contacts[email];
     c.name = name || c.name; c.org = org || c.org; c.track = track || c.track;
@@ -114,7 +144,7 @@ app.post('/track/sent', async (req, res) => {
       db.followupQueue.push({ email, name, org, track, type: 'day3', subject, sendAfter: new Date(now + 3*24*60*60*1000).toISOString() });
     if (!db.followupQueue.find(f => f.email === email && f.type === 'day7') && !db.sentFollowups.find(f => f.email === email && f.type === 'day7'))
       db.followupQueue.push({ email, name, org, track, type: 'day7', subject, sendAfter: new Date(now + 7*24*60*60*1000).toISOString() });
-    saveDB(db);
+    await saveDB(db);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
@@ -123,7 +153,7 @@ app.post('/track/sent', async (req, res) => {
 app.post('/cron/process', async (req, res) => {
   const key = req.headers['x-cron-key'] || req.body?.cronKey;
   if (key !== CRON_SECRET) return res.status(401).json({ error: 'Unauthorized' });
-  const db = loadDB();
+  const db = await loadDB();
   const now = new Date();
   const due = db.followupQueue.filter(f => new Date(f.sendAfter) <= now);
   console.log('Cron: processing', due.length, 'due follow-ups');
@@ -173,13 +203,13 @@ app.post('/cron/process', async (req, res) => {
       }
     } catch(e) { console.log('Follow-up error:', item.email, e.message); results.push({ email: item.email, type: item.type, error: e.message }); }
   }
-  saveDB(db);
+  await saveDB(db);
   res.json({ processed: due.length, results, remaining: db.followupQueue.length });
 });
 
 // ── GET EVENTS (app reads this) ───────────────────────────────────
-app.get('/events', (req, res) => {
-  const db = loadDB();
+app.get('/events', async (req, res) => {
+  const db = await loadDB();
   res.json({ contacts: db.contacts, followupQueue: db.followupQueue, sentFollowups: db.sentFollowups, recentEvents: db.events.slice(-100) });
 });
 
@@ -305,8 +335,8 @@ app.post('/scrape-email', async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message, emails: [] }); }
 });
 
-app.get('/suppressed', (req, res) => {
-  const db = loadDB();
+app.get('/suppressed', async (req, res) => {
+  const db = await loadDB();
   const suppressed = Object.values(db.contacts)
     .filter(c => c.bounced || c.unsubscribed)
     .map(c => ({ email: c.email, reason: c.unsubscribed ? 'unsubscribed' : 'bounced', at: c.unsubscribedAt || c.firstSentAt }));
@@ -314,8 +344,8 @@ app.get('/suppressed', (req, res) => {
 });
 
 // Sync endpoint - returns webhook store stats (Email Activity API requires paid add-on)
-app.get('/sendgrid/sync', (req, res) => {
-  const db = loadDB();
+app.get('/sendgrid/sync', async (req, res) => {
+  const db = await loadDB();
   const total = Object.keys(db.contacts).length;
   res.json({ synced: total, newContacts: 0, updated: total, total });
 });
@@ -326,7 +356,7 @@ app.get('/sendgrid/stats', async (req, res) => {
     const apiKey = SENDGRID_KEY;
     if (!apiKey) return res.status(500).json({ error: 'No SENDGRID_API_KEY' });
 
-    const db = loadDB();
+    const db = await loadDB();
     const contacts = Object.values(db.contacts);
     const total = contacts.length;
     const delivered = contacts.filter(c => !c.bounced).length;
@@ -354,8 +384,8 @@ app.get('/sendgrid/stats', async (req, res) => {
 
 
 // GET /contacts - return all tracked contacts
-app.get('/contacts', (req, res) => {
-  const db = loadDB();
+app.get('/contacts', async (req, res) => {
+  const db = await loadDB();
   res.json({ contacts: Object.values(db.contacts), total: Object.keys(db.contacts).length });
 });
 
@@ -363,7 +393,7 @@ app.get('/contacts', (req, res) => {
 app.post('/contacts/register', async (req, res) => {
   try {
     const { email, name, org, subject, track, sentAt } = req.body;
-    const db = loadDB();
+    const db = await loadDB();
     if (!db.contacts[email]) db.contacts[email] = { email };
     const c = db.contacts[email];
     c.name = name||c.name; c.org = org||c.org; c.track = track||c.track;
@@ -375,18 +405,18 @@ app.post('/contacts/register', async (req, res) => {
       db.followupQueue.push({email,name,org,track,type:'day3',subject,sendAfter:new Date(sentTime+3*24*60*60*1000).toISOString()});
     if (!db.followupQueue.find(f=>f.email===email&&f.type==='day7') && !db.sentFollowups.find(f=>f.email===email&&f.type==='day7'))
       db.followupQueue.push({email,name,org,track,type:'day7',subject,sendAfter:new Date(sentTime+7*24*60*60*1000).toISOString()});
-    saveDB(db);
+    await saveDB(db);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
 // POST /config - store config server-side for cron use
-app.post('/config', (req, res) => {
+app.post('/config', async (req, res) => {
   try {
-    const db = loadDB();
+    const db = await loadDB();
     if (!db.config) db.config = {};
     Object.assign(db.config, req.body);
-    saveDB(db);
+    await saveDB(db);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
@@ -394,4 +424,6 @@ app.post('/config', (req, res) => {
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'Legacy Workforce AI CSO', env: { sendgrid: !!SENDGRID_KEY, anthropic: !!ANTHROPIC_KEY, apollo: !!APOLLO_KEY } }));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Legacy CSO proxy running on port ' + PORT));
+initDB().then(() => {
+  app.listen(PORT, () => console.log('Legacy CSO proxy running on port ' + PORT));
+});
