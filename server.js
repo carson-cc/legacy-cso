@@ -228,8 +228,13 @@ app.post('/cron/process', async (req, res) => {
       }
     } catch(e) { console.log('Follow-up error:', item.email, e.message); results.push({ email: item.email, type: item.type, error: e.message }); }
   }
-  await saveDB(db);
-  res.json({ processed: due.length, results, remaining: db.followupQueue.length });
+  await await saveDB(db);
+  // Return slim summary only - cron-job.org has response size limit
+  res.json({
+    processed: results.length,
+    remaining: db.followupQueue.length,
+    summary: results.map(r => ({ email: r.email, type: r.type, success: r.success, error: r.error||null }))
+  });
 });
 
 // ── GET EVENTS (app reads this) ───────────────────────────────────
