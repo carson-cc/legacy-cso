@@ -357,3 +357,8 @@ under 36 symmetries about the origin, 36 427 vertices, 268 413 edges, origin deg
   vectors within radius 3.2 contain at most 375 of the 510 points. So from-scratch lattice balls are
   not the right supergraphs; unions of symmetric images and translates of the real graphs are.
 - Built: translate union of the 510 graph (every vertex moved to the origin) for star0 at the origin.
+- Haugland G3 (2131 vertices): (★0) SAT at every vertex, no unknowns (1590 s). So (★0) fails on
+  every certified 5-chromatic graph available (nine CNP graphs, G1, G3).
+- Running: (★0) at the origin of the orbit union (36 427 v) and of the translate union of the 510
+  graph (87 875 v, 914 690 e, origin degree 72); (★0) on the 40 highest-degree vertices of the
+  4478-vertex CNP union; pair-deletion sweep of the 510 graph (129 795 pairs, incremental SAT).
