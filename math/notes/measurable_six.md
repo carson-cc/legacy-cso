@@ -420,3 +420,17 @@ O' = O ± n with n(O') = −n(O), the two half-discs of A_1 at O and O' contain 
 of unit pairs, a contradiction. So reduced boundaries of 1-avoiding finite-perimeter sets have no
 unit chords except along normals with opposite orientation, the configuration of a diameter of a
 disc of diameter one.
+
+### Check-in 05:52 UTC
+- (★0) at the origin of the orbit union (36 427 v): 57 min of CaDiCaL, no verdict yet.
+- (★0) at the origin of the translate union (87 875 v): 37 min, no verdict yet, 1.7 GB.
+- (★0) on the 40 highest-degree vertices of the 4478-vertex CNP union: > 100 vertices' worth of
+  time, no hits so far. These union instances are orders of magnitude harder than the same test
+  on the individual graphs (0.03 s per vertex there), which is the first sign of real coupling.
+- Slack radii on the 510 graph (per vertex, largest radius whose vertices can all be forced into
+  three colors inside a 5-coloring of G − v): min 0.745, median 0.914, max 1.935; 361 of 510
+  vertices have radius < 1. So the doubled origin is satisfied only by colorings that use the
+  origin colors inside the unit disc, where measure theory forces nothing at points.
+- New finite test (disc_test.py): is the union unit-distance graph inside the punctured unit disc
+  {δ < |x| < 1} 4-colorable? If not, finite-perimeter colorings cannot have tiles of diameter < δ
+  (Lemma 5 + the punctured-neighborhood argument), forcing a locally finite map. Running.
