@@ -364,3 +364,59 @@ under 36 symmetries about the origin, 36 427 vertices, 268 413 edges, origin deg
   4478-vertex CNP union; pair-deletion sweep of the 510 graph (129 795 pairs, incremental SAT).
 - Pair deletions of the 510 graph: all 129 795 pairs leave a 4-colorable graph (incremental SAT,
   337 s, no unknowns). With vertex-criticality this closes "sub-509 by deletion" for this graph.
+
+## Tiles: the thick constraints that finite perimeter actually gives
+
+The point-based route (doubled origin, ergodic edges) fails on every available graph, and the
+slack diagnostic on the 510 graph shows why: the median radius around a vertex that can be forced
+into three colors inside a 5-coloring is 0.91, and for 361 of 510 vertices it is below 1, so the
+doubled-origin constraint is satisfied only by colorings that already use the origin's two colors
+at distance below 1 from the origin. Measure theory forces nothing at such interior points.
+Under finite perimeter, however, there are exact thick constraints at a fixed scale. They come from
+components, not points.
+
+Lemma 5 (components have diameter ≤ 1). Let A be measurable, 1-avoiding, of locally finite
+perimeter, and let T be an indecomposable component of A (Ambrosio–Caselles–Masnou–Morel). Then for
+every density point a of T, T ⊂ B(a, 1) up to a null set; in particular T has essential diameter ≤ 1.
+Proof. Density points of A avoid C(a) (Lemma 3 with c = 1, or Lemma 1). Put T_in = T ∩ B(a,1),
+T_out = T ∖ cl B(a,1); T = T_in ∪ T_out up to a null set. The distributional gradients D1_{T_in} and
+D1_{T_out} could only fail to add in total variation on a subset of C(a) where both have reduced
+boundary with opposite normals; at such a point T_in and T_out have density 1/2 each, so T has
+density 1, contradicting that no density point of T lies on C(a). Hence P(T) = P(T_in) + P(T_out),
+and indecomposability forces one part to be null. T_in contains a, so T_out is null. ∎
+
+Lemma 6 (shell exclusion). With T as above, let S(T) = { x : ess inf_{t∈T} |x−t| < 1 < ess sup_{t∈T} |x−t| }.
+Then S(T) contains no density point of A.
+Proof. For x ∈ S(T), the cut of T along C(x) has both parts of positive measure; by the argument of
+Lemma 5 this is only possible if C(x) contains density points of T, and then x is at unit distance
+from a density point of A, so x is not a density point of A (Lemma 1). ∎
+
+Lemma 7 (same-color components are close or far). For two components T, T' of A and any density
+point a of T, either T' ⊂ B(a,1) or T' ∩ B(a,1) is null (same cut argument applied to T'). The
+alternative cannot switch as a moves inside T (a switch would produce a density point of T' on
+some C(a)), so either all cross distances are < 1 or all are > 1.
+
+Consequence (wild maps). Grouping "close" components, every class of a finite-perimeter measurable
+coloring is a union of clusters of diameter ≤ 1 whose pairwise cross distances exceed 1, and each
+cluster carries the exact shell exclusion of Lemma 6, a region of width comparable to the cluster,
+with no rate involved. This is exactly the hypothesis set of the Woodall–Townsend theorem that
+map-type colorings need six colors, minus the regularity of tile boundaries. So the intermediate
+theorem of step 1 is:
+
+    Conjecture (wild Townsend). No measurable 5-coloring of the plane has all classes of locally
+    finite perimeter.
+
+Program W. (1) Obtain Townsend's proof and list every topological input (corners where three
+tiles meet, boundary curves, orientation). (2) Replace each by a measure-theoretic version:
+components for tiles, Lemma 6 for the unit-circle avoidance, junctions of the Caccioppoli
+partition for corners (H^1-a.e. boundary point lies on exactly one interface; the junction set is
+where the argument must be careful, since wild tiles may accumulate). (3) The rate obstruction
+returns only if tiles can be arbitrarily small near a junction; that is the case to isolate.
+This route needs no finite graph and no SAT. It is where I would put the next month.
+
+Rigidity remark (proved, not yet used). For a generic interface point O between classes 1 and 2
+with normal n, and any other generic interface point O' of ∂*A_1 on the unit circle C(O): unless
+O' = O ± n with n(O') = −n(O), the two half-discs of A_1 at O and O' contain a positive-measure family
+of unit pairs, a contradiction. So reduced boundaries of 1-avoiding finite-perimeter sets have no
+unit chords except along normals with opposite orientation, the configuration of a diameter of a
+disc of diameter one.
