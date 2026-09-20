@@ -1,13 +1,16 @@
 # Overnight summary (autonomous run, 2026-09-20 ~05:00–15:00 UTC) — DRAFT, finalized at the last check-in
 
 ## Headline
-A fully certified 5-chromatic unit-distance graph of diameter < 3: 6344 exact points in Q(√3,√11),
-all within the closed disc of radius 1.5, 39 962 exact unit edges, 4-colorability refuted by CaDiCaL
-with a 4 999 248-line DRAT proof verified by drat-trim. Files: notes/small5_r15_exact.txt (exact
-coordinates), notes/small5_r15.xy (float), notes/small5_r15.SHA256 (checksums of cnf/drat/coords).
-Regenerate cnf/drat with: python3 exactify.py notes/small5_r15.xy <510.vtx> <drat-trim>.
-Construction: union over all vertices g of Heule's 510-vertex graph of the translates G − g, restricted
-to |x| < 1.5 (big_translates.py + disc_test.py), then iterated unsat-core shrinking (core_iterate.py).
+A fully certified 5-chromatic unit-distance graph of diameter < 3. Two certified versions:
+- 4064 vertices: 26 translates G − g of Heule's 510-vertex graph, restricted to |x| < 1.5; exact
+  coordinates in Q(√3,√11) (notes/small5_tr15_exact.txt), 22 202 exact unit edges, radius 1.4999,
+  diameter < 3; refutation of 4-colorability by CaDiCaL with a triangle pin, 671 068-line DRAT proof,
+  drat-trim "s VERIFIED". Checksums notes/small5_tr15.SHA256; translate list notes/small5_tr15.xy.translates.
+- 6344 vertices (earlier, larger version): notes/small5_r15_exact.txt, 39 962 edges, 4 999 248-line DRAT,
+  verified. A sub-disc of radius 1.4583 of this set is also refuted (budgeted), diameter ≤ 2.917.
+For comparison the 510-vertex graph itself has diameter 4.864. Regenerate proofs with
+python3 exactify.py <xy> <510.vtx> <drat-trim>. The construction is big_translates.py + disc_test.py,
+then core_iterate.py / translate_min.py / chunk_min.py.
 
 ## The six mission: where it stands
 - Doubled-origin criteria (★0), (★), (★R): fail on every certified 5-chromatic graph available
