@@ -260,3 +260,40 @@ Level-4 sanity check in this repo. On the 451-point exact universe (one Minkowsk
 norm ≤ 9), the level-4 analogue of (★0) is SAT: G − origin has a 4-coloring with N(origin)
 2-colored. So the 24-vertex bichromatic-origin graph is not inside this universe; the
 depth-2 universe is being tested (notes/level4_depth2.log).
+
+### Run 2: a bichromatic-origin graph found from scratch (level 5 = Falconer's level)
+
+bichromatic_origin_cert.py, depth-2 exact universe (4141 points, all 4-colorable), origin v.
+Radius restriction (norm ≤ 2.5, 1891 points) then greedy deletion gives
+
+    G: 48 exact points (origin + 47), 147 exact unit edges, deg(origin) = 12,
+    G − v is 4-colorable, but G − v has NO 4-coloring in which N(v) uses only two colors.
+
+So G with v doubled is 5-chromatic: a "5-chromatic graph with a bichromatic origin", the finite
+core of the measurable-χ ≥ 5 argument, reproduced independently of the literature's 24-vertex
+example (ours is not minimal). Coordinates: notes/bichromatic_origin_k4_vertices.txt.
+Verification, all from the coordinate file alone: edges recomputed exactly; Glucose4 UNSAT;
+Minisat22 UNSAT; a pure-Python backtracking search with no SAT solver finds no coloring, and
+finds one as soon as the two-color restriction on N(v) is dropped. CaDiCaL's DRAT output for
+this instance is empty (solved in preprocessing), so drat-trim cannot check it; the three
+independent refutations stand in for it. Together with Lemma 3 and a reduced-boundary
+bichromatic point this gives a self-contained proof that no measurable 4-coloring of the plane
+has a color class of locally finite perimeter. That is weaker than Falconer and superseded by
+de Grey; its only value is that the same code, fed a 5-chromatic graph, tests level 6.
+
+Remark on Run 1: on a lattice of spacing s the tolerance is quantized. The s = 0.1 patches at
+ε = 0.08 and 0.06 are the same graph (edge shells 0.1·√N for N in {91,...,112}), whose edge
+lengths lie in [0.954, 1.0583]. So the certified statement is a 6-chromatic ε-UDG with
+ε = 0.0583 on 931 vertices. The s = 0.05 runs (ε = 0.05, 0.04, 0.03) were still running when
+this note was written; see notes/sweep_k5_small_eps.log.
+
+## State of play
+
+Proved here: Lemmas 1–3; existence of bichromatic points; the conditional theorem
+"(★0) or (★) for some finite (G, v[, z]) ⟹ no measurable 5-coloring with a finite-perimeter
+class"; a from-scratch level-5 certificate validating the pipeline.
+Not proved: measurable χ ≥ 6. The obstruction is purely finite now: nobody has exhibited a
+unit-distance graph whose doubled-vertex version (★0), or doubled-vertex-plus-ergodic-edge
+version (★), is 6-chromatic. Polymath16 looked for (★0) and, as far as the summaries say,
+did not find it. (★) is weaker than (★0) and is the sweep I would run first on the
+509-vertex graph: 509 SAT calls for (★0), then ≈ 509 × 508 calls for (★).
