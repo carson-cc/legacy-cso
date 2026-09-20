@@ -362,3 +362,5 @@ under 36 symmetries about the origin, 36 427 vertices, 268 413 edges, origin deg
 - Running: (★0) at the origin of the orbit union (36 427 v) and of the translate union of the 510
   graph (87 875 v, 914 690 e, origin degree 72); (★0) on the 40 highest-degree vertices of the
   4478-vertex CNP union; pair-deletion sweep of the 510 graph (129 795 pairs, incremental SAT).
+- Pair deletions of the 510 graph: all 129 795 pairs leave a 4-colorable graph (incremental SAT,
+  337 s, no unknowns). With vertex-criticality this closes "sub-509 by deletion" for this graph.
