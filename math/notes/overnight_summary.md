@@ -1,16 +1,21 @@
 # Overnight summary (autonomous run, 2026-09-20 05:00–15:07 UTC) — FINAL
 
 ## Headline
-A fully certified 5-chromatic unit-distance graph of diameter < 3. Two certified versions:
-- 4064 vertices: 26 translates G − g of Heule's 510-vertex graph, restricted to |x| < 1.5; exact
-  coordinates in Q(√3,√11) (notes/small5_tr15_exact.txt), 22 202 exact unit edges, radius 1.4999,
-  diameter < 3; refutation of 4-colorability by CaDiCaL with a triangle pin, 671 068-line DRAT proof,
-  drat-trim "s VERIFIED". Checksums notes/small5_tr15.SHA256; translate list notes/small5_tr15.xy.translates.
-- 6344 vertices (earlier, larger version): notes/small5_r15_exact.txt, 39 962 edges, 4 999 248-line DRAT,
-  verified. A sub-disc of radius 1.4583 of this set is also refuted (budgeted), diameter ≤ 2.917.
-For comparison the 510-vertex graph itself has diameter 4.864. Regenerate proofs with
-python3 exactify.py <xy> <510.vtx> <drat-trim>. The construction is big_translates.py + disc_test.py,
-then core_iterate.py / translate_min.py / chunk_min.py.
+A fully certified 5-chromatic unit-distance graph of diameter 2.296 (the 510-vertex graph has 4.864).
+Chain of certified versions, all subsets of the same exact point set (points p − g for vertices p, g of
+Heule's 510-vertex graph, coordinates in Q(√3,√11); exact edge set identical to the float edge set):
+| radius | vertices | edges | diameter | solver | proof | checker |
+|---|---|---|---|---|---|---|
+| 1.15  | 4341 | 21 378 | 2.296 | kissat 4.0.4 | 2.6 GB DRAT | drat-trim VERIFIED (5865 s) |
+| 1.18  | 4493 | 22 770 | 2.356 | kissat | 919 MB | VERIFIED (1620 s) |
+| 1.2074| 4655 | 24 167 | 2.415 | kissat | 462 MB | VERIFIED (921 s) |
+| 1.3553| 5453 | 31 138 | 2.710 | kissat | 82 MB | VERIFIED (127 s) |
+| 1.5 (26 translates) | 4064 | 22 202 | < 3 | CaDiCaL | 671 068 lines | VERIFIED |
+| 1.5 | 6344 | 39 962 | < 3 | CaDiCaL | 4 999 248 lines | VERIFIED |
+Radius 1.10 of the same set is 4-colorable (kissat SAT), so this set's threshold is in (1.10, 1.15].
+Files: notes/small5_r115_exact.txt (and r118, r1207, r1355, tr15, r15), *.SHA256 checksums; the
+CNF/DRAT files are regenerable (export_cnf.py + kissat, or exactify.py). Literature: nothing found on
+the minimum diameter of a 5-chromatic unit-distance graph; verify before claiming novelty.
 
 ## The six mission: where it stands
 - Doubled-origin criteria (★0), (★), (★R): fail on every certified 5-chromatic graph available
