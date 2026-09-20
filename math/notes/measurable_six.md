@@ -155,3 +155,85 @@ Consistent with Exoo's bound of at least 5 for every eps.
 Literature check (after the fact): these UNSAT results are reproductions, not new. The
 chromatic number of the plane with an interval of forbidden distances is known to be at
 least 6 and, per arXiv:2304.10163 (2023), at least 7. See the literature section below.
+
+## Literature (from search summaries; full texts unreachable from this sandbox)
+
+- Exoo 2005 (DCG): the ε-unit-distance graph needs at least 5 colors for every ε > 0.
+- arXiv:2201.04499 (Coloring distance graphs on the plane) and Parts, arXiv:2303.14722:
+  chromatic number with an interval of forbidden distances is at least 6 on wide ranges.
+- arXiv:2304.10163 (2023): "The chromatic number of the plane with an interval of
+  forbidden distances is at least 7." If this covers every interval, then P1 is closed:
+  the ε-UDG is 7-chromatic for every ε > 0, and Run 1 above is a reproduction.
+- Falconer 1981 (JCTA 31, 184–189): measurable chromatic number of R^n is at least n+3.
+  Polymath16 describes the mechanism as: fix an origin that is an "edge" point taking two
+  colors, rotate a Moser spindle about it, the two far vertices must take the two origin
+  colors in different ways, and the spindle angle being an irrational multiple of π
+  contradicts measurability. Polymath16 "built on Falconer's main idea ... using a
+  5-chromatic graph with a bichromatic origin and a lemma derived from Falconer that was a
+  simple modification of a lemma of Croft". I could not read what they concluded.
+
+## Reconstruction of Falconer's mechanism, and the finite criterion it reduces to
+
+Lemma 3 (Croft-type, rate-free). Let A be measurable and 1-avoiding, and suppose A has
+upper density at least c at x along scales r_n → 0. Then every point y with |x-y| = 1 has
+A-deficiency at least c/5 in B(y, 2r_n), so y is not a density point of A.
+Proof. For a ∈ B(x,r) the circle C(a) crosses B(y,2r) in an arc of length ≥ 2√3 r, and
+C(b) ∩ B(x,r) has length ≤ 4r for every b. Fubini on unit pairs gives
+μ{ b ∈ B(y,2r) : C(b) meets A ∩ B(x,r) } ≥ (√3/2) c π r^2, and those b are not in A. ∎
+
+Definition. A point O is (i,j)-bichromatic if A_i and A_j both have upper density ≥ c > 0
+at O along a common sequence of scales. Such points exist: the essential boundary of any
+class has positive H^1 measure (Federer), and a nested-ball argument produces a point where
+A_1 and its complement both have density ≥ 1/8 along a sequence; pigeonhole picks j.
+
+Falconer's argument in this language. Take a (1,2)-bichromatic O and the unit rhombus
+(O,p,q,z), |Oz| = √3, rotated by θ. For a.e. θ (see the caveat below) p, q, z are density
+points of single classes. Lemma 3 applied to both A_1 and A_2 forces c(p), c(q) ∉ {1,2},
+so in a 4-coloring {c(p),c(q)} = {3,4} and c(z) ∈ {1,2}. The far vertices z(θ) and
+z(θ+α), cos α = 5/6, are at unit distance, so h(θ) = c(z(θ)) is a measurable {1,2}-valued
+function with h(θ+α) ≠ h(θ) a.e.; then h(θ+2α) = h(θ) a.e., and 2α/π is irrational
+(Niven), so h is a.e. constant: contradiction.
+
+Combinatorial core. Double the origin into adjacent vertices O_1, O_2 and join z to both:
+the rhombus becomes K_5. Falconer's theorem is "K_5 is not 4-colorable" plus two
+measurable realizations of virtual edges: the doubled vertex is a bichromatic boundary point,
+and the two O–z edges are the ergodic argument on the circle of radius |Oz|.
+
+Criterion (★). Let G be a finite unit-distance graph with vertices v, z, |vz| = d, and let
+G'' be G with v doubled (v_1, v_2 adjacent, same neighborhood) and z joined to v_1, v_2.
+If χ(G'') ≥ 6 and the unit-chord angle β_d = 2 arcsin(1/(2d)) is an irrational multiple
+of π, then the argument above, run with G in place of the rhombus, shows that no measurable
+5-coloring of the plane exists in which the bichromatic point can be chosen well
+(next paragraph). Equivalently (★) is one SAT call: 5-color G − v with N(v) forbidden
+colors {1,2} and z forbidden {1,2}; UNSAT means (★).
+Necessary condition: if G is 4-colorable then every 4-coloring has c(v) = c(z)
+(a forced-equal pair at distance d). Such pairs are exactly what spindles into a
+5-chromatic graph, so (★) lives at the scale of the 5-chromatic constructions, not below.
+
+Caveat (null sets on circles). The vertices p(θ), q(θ), z(θ) lie on circles about the
+specific point O, and the null set N of non-density points may contain whole circles.
+Resolution when some class has locally finite perimeter: its reduced boundary is
+rectifiable of positive H^1 measure (De Giorgi–Federer), the map (O,u) ↦ O + ρu from a
+rectifiable curve times S^1 pushes H^1 ⊗ σ to an absolutely continuous measure (area
+formula), so for H^1-a.e. reduced-boundary point O every circle C_ρ(O) meets N in a
+σ-null set. Reduced-boundary points are bichromatic (blow-up is a half-plane). The
+density-point coloring is Borel, so its restriction to a circle is measurable.
+So the rigorous statement I can defend is:
+
+  Theorem (conditional on (★)). If (★) holds for some (G, v, z), then there is no
+  measurable 5-coloring of the plane in which some color class has locally finite perimeter.
+
+That already covers every map-type coloring and much more. Removing the perimeter
+hypothesis needs a bichromatic point off the null set for purely unrectifiable boundaries,
+which is where I would want Falconer's own text.
+
+## Program, revised
+
+P1'. Find (G, v, z) satisfying (★). Search space: unit-distance graphs in the Moser-type
+     ring (Eisenstein integers times rotations with rational cosine), starting from any
+     known graph with a forced-equal pair under 4-colorings (the Exoo–Ismailescu spindle
+     construction produces such pairs, if memory serves; verify). bichromatic_search.py
+     runs (a) forced-equal and (b) (★) on the exact universes of this repo.
+P2'. Remove the finite-perimeter hypothesis (read Falconer 1981 and Croft 1967).
+P3'. The size/rate obstruction of Corollary 4 is bypassed entirely by this route: the
+     ergodic step replaces the union bound. That is the real lesson of Falconer's proof.
