@@ -337,3 +337,15 @@ interchangeable, R is determined by 8 SAT calls per (v, z), on a two-copy instan
 edges couple every vertex at distance d from v with its own rotated copy, plus coincidences.
 Richer states (colors of several vertices on the same circle) give finer relations and a
 strictly stronger test; the single-vertex state is the first pass. starR.py implements it.
+
+### Run 3 (continued): ergodic criterion sample, orbit union
+
+(★R) with single-vertex state, 510-vertex graph, vertices 0–19, 75 648 SAT calls, no unknowns:
+no hits. In 9448 of 9456 (v, z) cases the relation R is the complete relation minus the diagonal:
+the color of z at θ and at θ + β_d is unconstrained beyond the chord edge itself. So the two copies
+barely interact at the chord angle, and richer states on that circle cannot help. The interaction
+must come from lattice rotations (cos 5/6), where the rotated copy shares hundreds of unit
+distances with the original; but a union of lattice-rotated copies is itself a unit-distance graph,
+so that case is just (★0) on a larger graph. Orbit union built (big_orbit.py): all CNP graphs
+under 36 symmetries about the origin, 36 427 vertices, 268 413 edges, origin degree 360.
+(★0) at the origin of this graph is the strongest single test available here; result below.
