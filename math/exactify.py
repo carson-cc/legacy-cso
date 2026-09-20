@@ -25,6 +25,13 @@ k=4; var=lambda u,c: u*k+c+1
 cl=[[var(u,c) for c in range(k)] for u in range(n)]
 for a,b in E:
     for c in range(k): cl.append([-var(a,c),-var(b,c)])
+adj={}
+for a,b in E: adj.setdefault(a,set()).add(b); adj.setdefault(b,set()).add(a)
+for a,b in E:                       # symmetry pin: one triangle gets colours 0,1,2 (valid up to colour permutation)
+    com=adj[a]&adj[b]
+    if com:
+        for c,u in enumerate((a,b,min(com))): cl.append([var(u,c)])
+        break
 s=Cadical153(bootstrap_with=cl,with_proof=True); r=s.solve(); pr=s.get_proof() if not r else None; s.delete()
 print("4-colorable (exact graph): %s"%r,flush=True)
 if r is False:
