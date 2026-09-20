@@ -563,3 +563,9 @@ drat-trim "s VERIFIED" (127 s). Exact coordinates: notes/small5_r1355_exact.txt 
 6344 set, whose exact edge set equals the float edge set, so the refutation applies to the exact graph).
 Checksums notes/small5_r1355.SHA256. CaDiCaL via PySAT had left this instance UNKNOWN at 3M conflicts.
 Diameter of this graph: see the run log; radius ≤ 1.3553.
+
+## RESULT (16:15 UTC): diameter ≤ 2.415
+kissat refutes the subset |x| < 1.2074 of the certified set: 4655 vertices, 24 167 edges, DRAT 462 MB,
+drat-trim "s VERIFIED" (921 s, 48 RAT lemmas). Exact coordinates notes/small5_r1207_exact.txt,
+checksums notes/small5_r1207.SHA256. The 0.9 disc of the full translate union (12 820 points) is
+4-colorable (kissat, SAT). Running: radii 1.10, 1.05, 1.00 of the certified set; symmetric unit disc.
