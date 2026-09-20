@@ -297,3 +297,43 @@ unit-distance graph whose doubled-vertex version (★0), or doubled-vertex-plus-
 version (★), is 6-chromatic. Polymath16 looked for (★0) and, as far as the summaries say,
 did not find it. (★) is weaker than (★0) and is the sweep I would run first on the
 509-vertex graph: 509 SAT calls for (★0), then ≈ 509 × 508 calls for (★).
+
+## Run 3: the criteria on certified 5-chromatic graphs ("Do it")
+
+Inputs (public GitHub, cloned into the scratchpad, not committed): Heule's CNP-SAT bundle
+(510, 517, 529, 553, 610, 633, 803, 826, 874-vertex 5-chromatic graphs, coordinates in
+Q(√3,√11), DRAT proofs of non-4-colorability) and the Haugland 2131-vertex certificate
+repository (G1: 740 vertices with the pair property; G3: 2131 vertices, χ = 5, spindle-free).
+Scripts: star_on_graph.py (edge-list only), starR.py (needs coordinates).
+
+(★0), every vertex, all nine CNP-SAT graphs and G1: SAT everywhere, no unknowns. So no vertex
+of these graphs has a color-saturated neighborhood in every 5-coloring. G3 (2131) in progress.
+(★), every pair (v, z), 510-vertex graph: SAT everywhere (245 000 incremental calls, 60 s).
+From-scratch depth-3 ring ball (27 301 points, seed rotations cos 5/6 and 7/8): 4-colorable;
+only 135 of the 510 graph's points lie in it, so the seed lacks the rotations the known graphs use.
+
+## The general ergodic criterion (★R)
+
+Fix v, a vertex z at distance d > 1/2 from v, and δ = β_d = 2 arcsin(1/(2d)), assumed an
+irrational multiple of π. Rotating the configuration about the bichromatic point O by δ gives,
+for a.e. θ, two proper 5-colorings of G − v (at angles θ and θ + δ), both with N(v) ⊂ {3,4,5},
+and every pair (u(θ), w(θ+δ)) at unit distance is an edge between the two copies. Let Ω be a
+finite "state" read off a coloring (here: the color of z) and R ⊂ Ω × Ω the set of state pairs
+realizable by the two-copy system (SAT calls). The state process s(θ) = state of the θ-copy is
+measurable with (s(θ), s(θ+δ)) ∈ R a.e.
+
+Lemma 4. If every component of R that contains an edge has period ≥ 2 (for symmetric R: is
+bipartite, loops counting as odd cycles), then no such measurable s exists.
+Proof. The support of the law of s is a union of components of R; the set of θ whose state lies
+in a given component is invariant under rotation by δ, hence null or conull by ergodicity, so
+s lives in one component C. If C has period p ≥ 2 with cyclic classes C_0, …, C_{p−1}, the phase
+ψ(θ) = i for s(θ) ∈ C_i satisfies ψ(θ+δ) = ψ(θ)+1 mod p, so ψ is invariant under rotation by pδ,
+which is again irrational, so ψ is a.e. constant, contradicting ψ(θ+δ) ≠ ψ(θ). ∎
+
+Falconer's argument is Lemma 4 with R = {(1,2),(2,1)}. (★) is R ⊂ {1,2}². Lemma 4 also
+accepts, for example, R = {(1,3),(3,1),(2,3),(3,2)} ("z takes an origin color at θ iff it takes a
+non-origin color at θ+δ"), which neither (★0) nor (★) sees. Because colors 1,2 and 3,4,5 are
+interchangeable, R is determined by 8 SAT calls per (v, z), on a two-copy instance whose cross
+edges couple every vertex at distance d from v with its own rotated copy, plus coincidences.
+Richer states (colors of several vertices on the same circle) give finer relations and a
+strictly stronger test; the single-vertex state is the first pass. starR.py implements it.
