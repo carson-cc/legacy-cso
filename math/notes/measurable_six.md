@@ -460,3 +460,7 @@ If it certifies, this is a 5-chromatic unit-distance graph of diameter ≤ 3 (th
 diameter 4.864). Radii 0.85 and below are 4-colorable; 0.875 and 0.9 are being settled.
 Decision: the doubled-origin test on the orbit union (1 h 47 min, no verdict) was stopped to
 free the core; the disc program is now the priority.
+- 06:55 UTC: drat-trim on the radius-1.5 proof: "s VERIFIED" (188 s; 111 910 of 973 853 clauses in core,
+  core touches 7940 vertices). So, modulo exact re-derivation of the float edge list, the unit-distance
+  graph on the translate-union points with |x| < 1.5 is 5-chromatic. Minimization (fast_min.py) and
+  the punctured unit disc {0.1 < |x| < 1} with a 30M-conflict budget are running.
