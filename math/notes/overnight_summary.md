@@ -28,8 +28,29 @@ then core_iterate.py / translate_min.py / chunk_min.py.
 ## The 508 mission
 510 graph is vertex-critical; all 129 795 pair deletions are 4-colorable. No sub-509 by deletion.
 
-## Literature status
-(filled at the end)
+## Step-2 literal test (forced-equal pairs under 5-colorings)
+forced5.py: on the 510, 517, 529, 553, 610, 633, 803, 826, 874-vertex graphs and Haugland's G1, every
+non-adjacent pair can be colored differently in some 5-coloring (about 2.2 million pairs, zero unknowns,
+seconds per graph). So none of these graphs spindles to six. (4064-vertex graph, 2347, G3: see
+notes/forced5_all.log for the final entries.)
 
-## Everything else (files, scripts, logs)
-(filled at the end)
+## Literature status
+Searches reachable from the sandbox (arXiv, ScienceDirect and the Polymath blogs are blocked by the
+proxy; only search summaries were available): Falconer 1981 (measurable ≥ 5), Polymath16 used a
+24-vertex "5-chromatic graph with a bichromatic origin" for measurable 5 and attempted 6; the ε-unit
+distance graph is known to need ≥ 6, and arXiv:2304.10163 claims ≥ 7 for a forbidden interval; nothing
+found on the minimum diameter of a 5-chromatic unit-distance graph. Verify before citing.
+
+## Files (math/)
+- notes/measurable_six.md: all lemmas (1–7), criteria (★0)/(★)/(★R), Program W, every run with numbers.
+- notes/small5_tr15_exact.txt, small5_tr15.xy, small5_tr15.xy.translates, small5_tr15.SHA256,
+  data/small5_tr15.edge: the certified 4064-vertex diameter<3 graph. cnf/drat regenerable via exactify.py.
+- notes/small5_r15_exact.txt, small5_r15.xy, small5_r15.SHA256: the 6344-vertex version.
+- notes/bichromatic_origin_k4_vertices.txt: the 48-vertex level-5 (Falconer-level) certificate.
+- Scripts: surgery.py, udg.py (exact field incl. division), vtx_exact.py, star_on_graph.py, starR.py,
+  bichromatic_search.py, big_orbit.py, big_translates.py, big_sym_disc2.py, disc_test.py,
+  core_iterate.py, translate_min.py, chunk_min.py, radius_min.py, exactify.py, forced5.py, pairs.py,
+  critical.py, slack510.py, eps_udg.py, verify_eps.py.
+- Logs: notes/*.log (re-added at the end of the run).
+External inputs (not committed; cloned into the scratchpad): github.com/marijnheule/CNP-SAT,
+github.com/Amberlogy/haugland-2131-certificates, github.com/marijnheule/drat-trim.
