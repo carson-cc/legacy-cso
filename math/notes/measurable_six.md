@@ -555,3 +555,11 @@ from this graph. The same test is running on the other certified graphs (notes/f
   stopped after 4 h, no verdict. Symmetric R = 1.25: stopped earlier, no verdict.
 - forced5.py on the 4064-vertex graph: stopped after 75 min with no hits in the portion run (incomplete);
   G2347 and G3 not run. All background jobs stopped.
+
+## RESULT (15:45 UTC): diameter ≤ 2.711 with kissat
+kissat 4.0.4 (built from GitHub) refutes 4-colorability of the subset |x| < 1.3553 of the certified
+6344-point set: 5453 vertices, 31 138 edges, pinned CNF kis/r1355.cnf, DRAT proof 82 MB,
+drat-trim "s VERIFIED" (127 s). Exact coordinates: notes/small5_r1355_exact.txt (subset of the exact
+6344 set, whose exact edge set equals the float edge set, so the refutation applies to the exact graph).
+Checksums notes/small5_r1355.SHA256. CaDiCaL via PySAT had left this instance UNKNOWN at 3M conflicts.
+Diameter of this graph: see the run log; radius ≤ 1.3553.
