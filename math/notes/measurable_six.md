@@ -497,3 +497,7 @@ Comparison: the 510-vertex graph has diameter 4.864; de Grey-type constructions 
 Whether a diameter below 3 was known for a 5-chromatic unit-distance graph needs a literature check;
 I have not seen it. Radii: the same construction is 4-colorable inside radius 0.85; between 0.93
 and 1.5 the instances are hard (radius_min.py, running).
+- 08:54 UTC: radius search on the certified 6344-point set: |x| ≤ 1.4656 (6121 points) is refuted within
+  a 3M-conflict budget (diameter ≤ 2.931); 1.2074, 1.3553, 1.4271 undecided within budget; 0.9304 is
+  4-colorable. Translate-level minimization: 190 of 510 translates (17 208 points) still refuted after
+  six block removals; continuing.
