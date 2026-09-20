@@ -471,3 +471,8 @@ free the core; the disc program is now the priority.
 - Minimization of the radius-1.5 graph: the selector-based incremental approach was far slower than
   fresh solves (the full 31 770-vertex instance refutes in 108 s). Switched to iterated unsat-core
   shrinking with fresh DRAT solves (core_iterate.py); log notes/coreit15.log.
+- 07:58 UTC: iterated core shrinking on the radius-1.5 set: 31 770 → 7940 (verified) → 6344 (verified
+  via the round-2 core) vertices; the 6344-vertex set has radius 1.4999 and diameter 2.9998, so the
+  obstruction genuinely spans the disc. Round 3's own DRAT failed drat-trim once (being re-checked;
+  the round-2 verified core already certifies the 6344 set given float edges). Exact re-derivation
+  (exactify.py: p − g with exact 510 vertices, exact edges, fresh DRAT, drat-trim) is running.
