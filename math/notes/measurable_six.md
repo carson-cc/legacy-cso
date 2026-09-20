@@ -584,3 +584,7 @@ Threshold of this set now in (1.10, 1.15]; radius 1.125 running.
 - 19:10 UTC: kissat on the symmetric unit disc (100 872 points, 514 194 lattice unit edges): UNKNOWN at the
   3.9 h limit. The punctured-unit-disc lever for Program W stays open. Radius 1.125 of the certified
   set still running (2.3 h).
+- 20:35 UTC: kissat on radius 1.125 aborted at 3 h 20 min when its proof file (9.4 GB) filled the disk;
+  verdict unknown. Bracketing stops here: certified threshold interval (1.10, 1.15]. Deleted the
+  proofs of SAT/unknown runs; the verified proofs (r115, r118, r1207, r1355, tr15, r15) are kept
+  and checksummed.
