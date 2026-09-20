@@ -542,3 +542,10 @@ minimizer has not completed a pass by 14:23, stop it and keep the certified 4064
 forced5.py: for every non-adjacent pair (u,v) of the 510 graph, "5-color G with c(u) ≠ c(v)" is SAT:
 127 291 pairs, zero unknowns, 35 s. So no pair is forced equal in all 5-colorings; no spindling to six
 from this graph. The same test is running on the other certified graphs (notes/forced5_all.log).
+
+### Check-in 14:25 UTC
+- Vertex minimizer stopped at 3741 vertices without completing its block-15 pass (3 h 57 min); the
+  certified 4064-vertex graph stands as the final version.
+- forced5.py on all nine CNP graphs and Haugland G1: no forced-equal pair under 5-colorings anywhere
+  (≈ 2.2 million pairs, zero unknowns). Running on the 4064-vertex graph; G2347 and G3 queued.
+- Symmetric disc tests: R = 1.0 at 4 h 30 min and the punctured unit disc at 3 h 26 min, undecided.
