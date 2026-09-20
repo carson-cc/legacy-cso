@@ -527,3 +527,8 @@ So: a 5-chromatic unit-distance graph on 4064 vertices of diameter < 3.
   the 26-translate graph is already tight. Time-capped at 3.5 h.
 - Symmetric disc tests at R = 1.0 (100 873 pts) and 1.25 (151 399 pts): 1 h each, no verdict yet.
   Launched the punctured symmetric unit disc {0.1 < |x| < 1.01} in parallel (the tile-size test).
+
+### Check-in 11:51 UTC
+- Vertex minimizer: 3741 vertices after the block-31 pass; block-15 pass running (1 h 23 min in, cap 3.5 h).
+- Symmetric disc tests: R = 1.0 and 1.25 at 1 h 56 min, punctured unit disc at 52 min; no verdicts.
+  They keep their 20M-conflict budgets until the final check-in; undecided is the likely outcome.
