@@ -8,7 +8,9 @@ from udg import F, P, unit_from_cos, OMEGA
 from surgery import exact_unit_edges
 from pysat.solvers import Cadical153
 J=int(sys.argv[1]); depth=int(sys.argv[2]); R=float(sys.argv[3]); vtx=sys.argv[4] if len(sys.argv)>4 else None
-w1=unit_from_cos(5,6); w1b=P(w1.x,-w1.y)
+# generator: half of the Moser angle, cos = sqrt(33)/6, sin = sqrt(3)/6  (its square is cos 5/6)
+w1=P(F.root(33,Fr(1,6)),F.root(3,Fr(1,6))); w1b=P(w1.x,-w1.y)
+assert w1.cmul(w1)==unit_from_cos(5,6)
 seed={}
 for j in range(-J,J+1):
     r=P(F.const(1),F.const(0))
