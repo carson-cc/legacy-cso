@@ -569,3 +569,5 @@ kissat refutes the subset |x| < 1.2074 of the certified set: 4655 vertices, 24 1
 drat-trim "s VERIFIED" (921 s, 48 RAT lemmas). Exact coordinates notes/small5_r1207_exact.txt,
 checksums notes/small5_r1207.SHA256. The 0.9 disc of the full translate union (12 820 points) is
 4-colorable (kissat, SAT). Running: radii 1.10, 1.05, 1.00 of the certified set; symmetric unit disc.
+- kissat on subsets of the certified set: radius 1.00 (3398 v), 1.05 (3750 v), 1.10 (4051 v) are
+  4-colorable (SAT). Threshold for this set is in (1.10, 1.2074]. Testing 1.15 and 1.18.
