@@ -505,3 +505,11 @@ and 1.5 the instances are hard (radius_min.py, running).
   22 202 float unit edges, radius 1.4999, still not 4-colorable (budgeted fresh solves at every step,
   final confirmation at 4M conflicts). Translate indices (0-based vertices of 510.vtx) in
   notes/small5_tr15.xy.translates. Exact re-certification (exactify.py) running.
+
+### Check-in 10:08 UTC
+- Radius search on the certified 6344-point set: |x| ≤ 1.4613 (6110 points) refuted within budget, so the
+  certified construction has diameter ≤ 2.923; 1.4575 undecided. (The proven radius is a property of
+  budgets, not of the graph; the true threshold is somewhere in 0.93–1.46.)
+- Exact certification of the 26-translate, 4064-point graph: exact edges 22 202 (= float), fresh
+  CaDiCaL solve with DRAT in progress. Symmetric disc tests (100 873 points at R=1.0, 151 399 at
+  R=1.25, lattice unit-vector edges) running, 14 min in, 1–1.7 GB each.
