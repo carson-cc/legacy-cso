@@ -513,3 +513,10 @@ and 1.5 the instances are hard (radius_min.py, running).
 - Exact certification of the 26-translate, 4064-point graph: exact edges 22 202 (= float), fresh
   CaDiCaL solve with DRAT in progress. Symmetric disc tests (100 873 points at R=1.0, 151 399 at
   R=1.25, lattice unit-vector edges) running, 14 min in, 1–1.7 GB each.
+
+## RESULT (10:40 UTC): the 4064-vertex version, fully certified
+26 translates of the 510 graph (notes/small5_tr15.xy.translates), 4064 exact points in Q(√3,√11)
+(notes/small5_tr15_exact.txt), all in the closed disc of radius 1.5 about the origin, 22 202 exact unit
+edges (identical to the float edge set), 4-colorability refuted by CaDiCaL with a triangle pin,
+671 068-line DRAT proof verified by drat-trim ("s VERIFIED"). Checksums: notes/small5_tr15.SHA256.
+So: a 5-chromatic unit-distance graph on 4064 vertices of diameter < 3.
