@@ -483,3 +483,17 @@ free the core; the disc program is now the priority.
   closed disc of radius 1.5 (diameter 2.9998), is not 4-colorable. A direct fresh proof on the exact
   graph (exactify.py) is being generated for a self-contained certificate; the 0.875 disc run was
   stopped to make room for a radius search on this set (radius_min.py).
+
+## RESULT (08:20 UTC): a 5-chromatic unit-distance graph of diameter < 3, fully certified
+
+Vertex set: 6344 points with exact coordinates in Q(√3, √11) (notes/small5_r15_exact.txt, each point
+is p − g for two vertices p, g of Heule's 510-vertex graph), all in the closed disc of radius 1.5
+about the origin; diameter 2.9998. Edge set: all 39 962 pairs at exact unit distance (recomputed in
+exact arithmetic; identical to the float edge set). Certificate: notes/small5_r15.cnf (4-coloring
+CNF with a pinned triangle) and notes/small5_r15.drat (4 999 248 lines, CaDiCaL 1.5.3 via PySAT),
+drat-trim: "s VERIFIED". SHA-256 sums in notes/small5_r15.SHA256. The cnf/drat are not committed
+(size); regenerate with exactify.py from the .xy file.
+Comparison: the 510-vertex graph has diameter 4.864; de Grey-type constructions are wider still.
+Whether a diameter below 3 was known for a 5-chromatic unit-distance graph needs a literature check;
+I have not seen it. Radii: the same construction is 4-colorable inside radius 0.85; between 0.93
+and 1.5 the instances are hard (radius_min.py, running).
