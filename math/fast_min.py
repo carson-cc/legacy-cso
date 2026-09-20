@@ -18,6 +18,9 @@ if corefile!="none":
         for lit in line.split():
             if lit!="0": cv.add((abs(int(lit))-1)//k)
     alive={v for v in cv if v<m}
+    keep=[keep[v] for v in sorted(alive)]; idx={v:i for i,v in enumerate(keep)}
+    E2=[(idx[a],idx[b]) for a,b in E if a in idx and b in idx]; m=len(keep); alive=set(range(m))
+    print("instance restricted to the core: %d vertices, %d edges"%(m,len(E2)),flush=True)
 var=lambda u,c: u*k+c+1; sel=lambda u: m*k+u+1
 cl=[[var(u,c) for c in range(k)]+[sel(u)] for u in range(m)]
 for a,b in E2:
