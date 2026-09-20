@@ -76,6 +76,43 @@ class F:
 
     __rmul__ = __mul__
 
+    def _primes(self):
+        ps=set()
+        for d in self.c:
+            n=d; q=2
+            while q*q<=n:
+                if n%q==0: ps.add(q); n//=q
+                else: q+=1
+            if n>1: ps.add(n)
+        return sorted(ps)
+
+    def _conj(self, flip):
+        """Galois conjugate flipping the sign of sqrt(p) for p in the set flip."""
+        c={}
+        for d,v in self.c.items():
+            n=d; sign=1
+            for p in flip:
+                if n%p==0: sign=-sign
+            c[d]=v*sign
+        return F(c)
+
+    def inv(self):
+        """Multiplicative inverse in the multiquadratic field (product of the other conjugates over the norm)."""
+        assert self.c, "division by zero"
+        ps=self._primes(); num=F.const(1); norm=self
+        from itertools import combinations
+        for r in range(1,len(ps)+1):
+            for S in combinations(ps,r):
+                cj=self._conj(S); num=num*cj; norm=norm*cj
+        assert set(norm.c)<={1}, "norm not rational"
+        return num*F.const(1/norm.c[1])
+
+    def __truediv__(self, o):
+        return self * _lift(o).inv()
+
+    def __rtruediv__(self, o):
+        return _lift(o) * self.inv()
+
     # ---- comparison / hashing ----
     def key(self):
         return tuple(sorted(self.c.items()))
