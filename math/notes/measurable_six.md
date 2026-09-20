@@ -464,3 +464,10 @@ free the core; the disc program is now the priority.
   core touches 7940 vertices). So, modulo exact re-derivation of the float edge list, the unit-distance
   graph on the translate-union points with |x| < 1.5 is 5-chromatic. Minimization (fast_min.py) and
   the punctured unit disc {0.1 < |x| < 1} with a 30M-conflict budget are running.
+
+### Check-in 07:34 UTC
+- Radius 0.9 (40M conflicts), 0.875 (20M) and the punctured disc 0.1 < |x| < 1 (30M) have each run
+  for 45–60 min without a verdict. Hard instances; left running.
+- Minimization of the radius-1.5 graph: the selector-based incremental approach was far slower than
+  fresh solves (the full 31 770-vertex instance refutes in 108 s). Switched to iterated unsat-core
+  shrinking with fresh DRAT solves (core_iterate.py); log notes/coreit15.log.
