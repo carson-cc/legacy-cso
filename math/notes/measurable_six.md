@@ -571,3 +571,8 @@ checksums notes/small5_r1207.SHA256. The 0.9 disc of the full translate union (1
 4-colorable (kissat, SAT). Running: radii 1.10, 1.05, 1.00 of the certified set; symmetric unit disc.
 - kissat on subsets of the certified set: radius 1.00 (3398 v), 1.05 (3750 v), 1.10 (4051 v) are
   4-colorable (SAT). Threshold for this set is in (1.10, 1.2074]. Testing 1.15 and 1.18.
+
+## RESULT (17:20 UTC): diameter ≤ 2.36
+kissat refutes the subset |x| < 1.18 of the certified set: 4493 vertices, 22 770 edges, DRAT 919 MB,
+drat-trim "s VERIFIED" (1620 s). Exact coordinates notes/small5_r118_exact.txt, checksums
+notes/small5_r118.SHA256. Radius 1.10 is 4-colorable, so the threshold of this set is in (1.10, 1.18].
