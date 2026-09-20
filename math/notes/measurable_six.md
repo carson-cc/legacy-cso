@@ -237,3 +237,26 @@ P1'. Find (G, v, z) satisfying (★). Search space: unit-distance graphs in the 
 P2'. Remove the finite-perimeter hypothesis (read Falconer 1981 and Croft 1967).
 P3'. The size/rate obstruction of Corollary 4 is bypassed entirely by this route: the
      ergodic step replaces the union bound. That is the real lesson of Falconer's proof.
+
+## Simplest criterion, and what Polymath16 already did
+
+Search summaries (full texts unreachable here) state that a "5-chromatic graph with a
+bichromatic origin containing just 24 vertices" was used to prove measurable χ ≥ 5, and that
+proving measurable χ ≥ 6 was "attempted" in Polymath16. So the doubled-vertex idea is theirs
+and the level-6 question is open.
+
+Criterion (★0), no ergodic step needed. Let G be a unit-distance graph and v a vertex such
+that G − v has no 5-coloring in which N(v) uses only three colors (equivalently: G with v
+doubled into an adjacent pair is 6-chromatic). Then, by Lemma 3 alone, a bichromatic point
+gives a 5-coloring of G − v with N(v) ⊂ {3,4,5} for a.e. rotation, a contradiction. So
+(★0) ⟹ no measurable 5-coloring with a finite-perimeter class. (★0) is a single SAT call
+per vertex, and it is the first thing to run on the 509/517/553/1581-vertex graphs:
+   5-color G with c(v)=1 and color 2 absent from N(v);  UNSAT for some v is the theorem.
+(★) with the far vertex z is strictly weaker than (★0) (Falconer's original rhombus needs
+it: the rhombus with doubled origin is only K_4 without z), so if (★0) fails on those graphs,
+(★) is the next sweep: 509 × (candidate z) SAT calls.
+
+Level-4 sanity check in this repo. On the 451-point exact universe (one Minkowski step,
+norm ≤ 9), the level-4 analogue of (★0) is SAT: G − origin has a 4-coloring with N(origin)
+2-colored. So the 24-vertex bichromatic-origin graph is not inside this universe; the
+depth-2 universe is being tested (notes/level4_depth2.log).
