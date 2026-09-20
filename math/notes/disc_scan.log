@@ -1,0 +1,5 @@
+annulus (0.000, 0.600) of trans510.edge: |V|=5904 |E|=6044  4-colorable: SAT (0s)
+annulus (0.000, 0.700) of trans510.edge: |V|=7938 |E|=17212  4-colorable: SAT (0s)
+annulus (0.000, 0.800) of trans510.edge: |V|=10184 |E|=32426  4-colorable: SAT (0s)
+annulus (0.000, 0.900) of trans510.edge: |V|=12820 |E|=52882  4-colorable: UNKNOWN (1004s)
+DISC_SCAN_DONE

@@ -1,0 +1,9 @@
+round 1: 31770 vertices 235520 edges -> UNSAT (117s)
+   drat-trim: VERIFIED
+round 2: 7940 vertices 50391 edges -> UNSAT (246s)
+   drat-trim: VERIFIED
+round 3: 6344 vertices 39962 edges -> UNSAT (336s)
+   drat-trim: NOT VERIFIED
+final: 6344 vertices, radius 1.4999, diameter 2.9998 (346s)
+wrote notes/small5_r15.xy
+CI_DONE

@@ -1,0 +1,13 @@
+graph 510.edge: |V|=510 |E|=2504  k=5
+  progress: 50 vertices, star0 hits=0 unknown=0 star hits=0 (9s)
+  progress: 100 vertices, star0 hits=0 unknown=0 star hits=0 (17s)
+  progress: 150 vertices, star0 hits=0 unknown=0 star hits=0 (27s)
+  progress: 200 vertices, star0 hits=0 unknown=0 star hits=0 (32s)
+  progress: 250 vertices, star0 hits=0 unknown=0 star hits=0 (36s)
+  progress: 300 vertices, star0 hits=0 unknown=0 star hits=0 (41s)
+  progress: 350 vertices, star0 hits=0 unknown=0 star hits=0 (46s)
+  progress: 400 vertices, star0 hits=0 unknown=0 star hits=0 (50s)
+  progress: 450 vertices, star0 hits=0 unknown=0 star hits=0 (55s)
+  progress: 500 vertices, star0 hits=0 unknown=0 star hits=0 (59s)
+DONE star0: hits=[] unknown=0 ; star hits=[]  (60s)
+SWEEP510_DONE

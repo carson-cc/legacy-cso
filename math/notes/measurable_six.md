@@ -549,3 +549,9 @@ from this graph. The same test is running on the other certified graphs (notes/f
 - forced5.py on all nine CNP graphs and Haugland G1: no forced-equal pair under 5-colorings anywhere
   (≈ 2.2 million pairs, zero unknowns). Running on the 4064-vertex graph; G2347 and G3 queued.
 - Symmetric disc tests: R = 1.0 at 4 h 30 min and the punctured unit disc at 3 h 26 min, undecided.
+
+### Final wrap-up 15:07 UTC
+- Symmetric unit disc (100 872 points): UNKNOWN after 20M conflicts (5 h). Punctured symmetric unit disc:
+  stopped after 4 h, no verdict. Symmetric R = 1.25: stopped earlier, no verdict.
+- forced5.py on the 4064-vertex graph: stopped after 75 min with no hits in the portion run (incomplete);
+  G2347 and G3 not run. All background jobs stopped.

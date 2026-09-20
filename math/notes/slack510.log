@@ -1,0 +1,12 @@
+  progress 50/510 (1s)
+  progress 100/510 (2s)
+  progress 150/510 (4s)
+  progress 200/510 (5s)
+  progress 250/510 (5s)
+  progress 300/510 (6s)
+  progress 350/510 (7s)
+  progress 400/510 (8s)
+  progress 450/510 (10s)
+  progress 500/510 (11s)
+DONE slack radii: min=0.7454 median=0.9135 max=1.9349; count r<1: 361; distribution: [(0.745, 1), (0.786, 6), (0.791, 1), (0.792, 1), (0.8, 3), (0.814, 1), (0.815, 3), (0.816, 5), (0.818, 2), (0.82, 1), (0.822, 1), (0.824, 3)]
+SLACK510_DONE

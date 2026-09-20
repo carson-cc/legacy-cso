@@ -1,0 +1,2 @@
+graph cnp_union.edge: |V|=4478 |E|=30206  k=5
+  progress: 100 vertices, star0 hits=0 unknown=0 star hits=0 (1951s)

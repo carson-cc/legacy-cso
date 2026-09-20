@@ -1,4 +1,4 @@
-# Overnight summary (autonomous run, 2026-09-20 ~05:00–15:00 UTC) — DRAFT, finalized at the last check-in
+# Overnight summary (autonomous run, 2026-09-20 05:00–15:07 UTC) — FINAL
 
 ## Headline
 A fully certified 5-chromatic unit-distance graph of diameter < 3. Two certified versions:
@@ -31,8 +31,8 @@ then core_iterate.py / translate_min.py / chunk_min.py.
 ## Step-2 literal test (forced-equal pairs under 5-colorings)
 forced5.py: on the 510, 517, 529, 553, 610, 633, 803, 826, 874-vertex graphs and Haugland's G1, every
 non-adjacent pair can be colored differently in some 5-coloring (about 2.2 million pairs, zero unknowns,
-seconds per graph). So none of these graphs spindles to six. (4064-vertex graph, 2347, G3: see
-notes/forced5_all.log for the final entries.)
+seconds per graph). So none of these graphs spindles to six. The 4064-vertex graph's sweep was stopped incomplete after 75 min (no hits in the portion run);
+G2347 and G3 were not run.
 
 ## Literature status
 Searches reachable from the sandbox (arXiv, ScienceDirect and the Polymath blogs are blocked by the
@@ -54,3 +54,21 @@ found on the minimum diameter of a 5-chromatic unit-distance graph. Verify befor
 - Logs: notes/*.log (re-added at the end of the run).
 External inputs (not committed; cloned into the scratchpad): github.com/marijnheule/CNP-SAT,
 github.com/Amberlogy/haugland-2131-certificates, github.com/marijnheule/drat-trim.
+
+## Final state of the disc program
+|x| < 1.5 (translate union): 5-chromatic, certified (the headline). |x| ≤ 0.85: 4-colorable.
+0.93–1.46: undecided within budgets. Symmetry-closed sets at R = 1.0 (100 872 points) and 1.25
+(151 399) and the punctured unit disc: undecided after 4–5 h each with 20M-conflict budgets.
+
+## What to do next (my recommendation)
+1. Literature check on the diameter result (minimum diameter of a 5-chromatic unit-distance graph);
+   if new, write it up with the certificate files (coordinates, cnf, drat, checksums, regeneration script).
+2. Program W (wild Townsend): get Townsend's paper, list its topological inputs, replace them with
+   Lemmas 5–7 (tiles, close/far, shell exclusion). This is the route to "no measurable 5-coloring
+   with finite-perimeter classes" and needs no SAT.
+3. The finite lever for W is a 5-chromatic graph in a punctured unit disc. The gap is radius 1.5 → 1.0.
+   Cube-and-conquer (march_cu + kissat) on the symmetric unit-disc instance is the natural next attempt;
+   the sandbox solver could not decide it in 5 h.
+4. Bichromatic-origin criteria on known graphs are exhausted (all negative, zero unknowns); do not
+   spend more compute there without a graph designed for saturation.
+5. The 510 graph: vertex-critical, no deletable pair, no forced-equal pair under 5-colorings.

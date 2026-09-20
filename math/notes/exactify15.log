@@ -1,0 +1,5 @@
+exact points: 6344, exact unit edges: 39962
+4-colorable (exact graph): False
+drat-trim: ['s VERIFIED'] (4999248 proof lines)
+wrote notes/small5_r15_exact.txt
+EX_DONE
