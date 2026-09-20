@@ -532,3 +532,8 @@ So: a 5-chromatic unit-distance graph on 4064 vertices of diameter < 3.
 - Vertex minimizer: 3741 vertices after the block-31 pass; block-15 pass running (1 h 23 min in, cap 3.5 h).
 - Symmetric disc tests: R = 1.0 and 1.25 at 1 h 56 min, punctured unit disc at 52 min; no verdicts.
   They keep their 20M-conflict budgets until the final check-in; undecided is the likely outcome.
+
+### Check-ins 12:42 and 13:33 UTC
+No new verdicts. Vertex minimizer still in its block-15 pass (3741 vertices); symmetric disc tests at
+R = 1.0 / 1.25 (3 h 40 min) and the punctured unit disc (2 h 35 min) undecided. Decision: if the
+minimizer has not completed a pass by 14:23, stop it and keep the certified 4064-vertex graph as final.
