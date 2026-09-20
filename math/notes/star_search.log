@@ -1,7 +1,0 @@
-universe depth=1 norm<=16: |V|=451 |E|=1704  deg(origin)=30  4-colorable=True
-(a) forced-equal partners of origin under 4-colorings: 0 []
-(b) star-condition partners (5 colors, doubled origin): 0 []
-universe depth=1 norm<=25: |V|=451 |E|=1704  deg(origin)=30  4-colorable=True
-(a) forced-equal partners of origin under 4-colorings: 0 []
-(b) star-condition partners (5 colors, doubled origin): 0 []
-STAR_DONE
