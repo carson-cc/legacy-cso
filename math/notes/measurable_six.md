@@ -501,3 +501,7 @@ and 1.5 the instances are hard (radius_min.py, running).
   a 3M-conflict budget (diameter ≤ 2.931); 1.2074, 1.3553, 1.4271 undecided within budget; 0.9304 is
   4-colorable. Translate-level minimization: 190 of 510 translates (17 208 points) still refuted after
   six block removals; continuing.
+- 09:57 UTC: translate-level minimization finished: 26 translates G − g of the 510 graph, 4064 points,
+  22 202 float unit edges, radius 1.4999, still not 4-colorable (budgeted fresh solves at every step,
+  final confirmation at 4M conflicts). Translate indices (0-based vertices of 510.vtx) in
+  notes/small5_tr15.xy.translates. Exact re-certification (exactify.py) running.
