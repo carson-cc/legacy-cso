@@ -537,3 +537,8 @@ So: a 5-chromatic unit-distance graph on 4064 vertices of diameter < 3.
 No new verdicts. Vertex minimizer still in its block-15 pass (3741 vertices); symmetric disc tests at
 R = 1.0 / 1.25 (3 h 40 min) and the punctured unit disc (2 h 35 min) undecided. Decision: if the
 minimizer has not completed a pass by 14:23, stop it and keep the certified 4064-vertex graph as final.
+
+### 13:50 UTC: the literal step-2 test (forced-equal pairs under 5-colorings)
+forced5.py: for every non-adjacent pair (u,v) of the 510 graph, "5-color G with c(u) ≠ c(v)" is SAT:
+127 291 pairs, zero unknowns, 35 s. So no pair is forced equal in all 5-colorings; no spindling to six
+from this graph. The same test is running on the other certified graphs (notes/forced5_all.log).
