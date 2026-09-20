@@ -476,3 +476,10 @@ free the core; the disc program is now the priority.
   obstruction genuinely spans the disc. Round 3's own DRAT failed drat-trim once (being re-checked;
   the round-2 verified core already certifies the 6344 set given float edges). Exact re-derivation
   (exactify.py: p − g with exact 510 vertices, exact edges, fresh DRAT, drat-trim) is running.
+- 08:10 UTC: exact re-derivation of the 6344-point set: every point is p − g for exact vertices p, g of
+  the 510 graph; the exact unit-distance graph has 39 962 edges and is IDENTICAL (as an edge set) to
+  the float graph used in the SAT runs. Hence the drat-trim-verified refutations (rounds 1–2) apply
+  verbatim to the exact graph: the exact unit-distance graph on these 6344 points, all inside the
+  closed disc of radius 1.5 (diameter 2.9998), is not 4-colorable. A direct fresh proof on the exact
+  graph (exactify.py) is being generated for a self-contained certificate; the 0.875 disc run was
+  stopped to make room for a radius search on this set (radius_min.py).
