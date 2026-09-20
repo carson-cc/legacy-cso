@@ -581,3 +581,6 @@ notes/small5_r118.SHA256. Radius 1.10 is 4-colorable, so the threshold of this s
 kissat refutes the subset |x| < 1.15 of the certified set: 4341 vertices, 21 378 edges, DRAT 2.6 GB,
 drat-trim "s VERIFIED". Exact coordinates notes/small5_r115_exact.txt, checksums notes/small5_r115.SHA256.
 Threshold of this set now in (1.10, 1.15]; radius 1.125 running.
+- 19:10 UTC: kissat on the symmetric unit disc (100 872 points, 514 194 lattice unit edges): UNKNOWN at the
+  3.9 h limit. The punctured-unit-disc lever for Program W stays open. Radius 1.125 of the certified
+  set still running (2.3 h).
