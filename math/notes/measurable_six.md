@@ -520,3 +520,10 @@ and 1.5 the instances are hard (radius_min.py, running).
 edges (identical to the float edge set), 4-colorability refuted by CaDiCaL with a triangle pin,
 671 068-line DRAT proof verified by drat-trim ("s VERIFIED"). Checksums: notes/small5_tr15.SHA256.
 So: a 5-chromatic unit-distance graph on 4064 vertices of diameter < 3.
+
+### Check-in 10:59 UTC
+- Radius search finished: smallest budget-proven radius 1.4583 on the 6344-point set (diameter ≤ 2.917).
+- Vertex-level chunked minimization of the 4064-point graph: 3871 vertices after two passes; slow, since
+  the 26-translate graph is already tight. Time-capped at 3.5 h.
+- Symmetric disc tests at R = 1.0 (100 873 pts) and 1.25 (151 399 pts): 1 h each, no verdict yet.
+  Launched the punctured symmetric unit disc {0.1 < |x| < 1.01} in parallel (the tile-size test).
