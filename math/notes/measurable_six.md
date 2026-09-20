@@ -448,3 +448,15 @@ For reference the 510 graph itself has circumradius 2.432 about its origin verte
 A 5-chromatic unit-distance graph inside a disc of radius 0.9 would be a large drop in diameter;
 the hardness jump between 0.85 and 0.9 is the thing to settle. If it is UNSAT, core_extract.py
 pulls a small subgraph out of the DRAT core and minimizes it.
+
+### 06:43 UTC: a 5-chromatic unit-distance graph inside a disc of radius 1.5
+disc_test.py on the translate union of the 510 graph, region |x| < 1.5: 31 770 vertices,
+235 520 edges (float unit test, tolerance 1e-8), 4-colorability UNSAT in 108 s, DRAT proof of
+1 423 006 lines written (notes/disc_trans510_0_1.5.drat). Pending: drat-trim verification, unsat-core
+extraction and greedy minimization (core_extract.py, log notes/core15.log), and exact re-derivation
+of the minimized graph's coordinates (each union point is p − g for exact vertices p, g of the 510
+graph, so exact coordinates and exact edges follow from vtx_exact.py).
+If it certifies, this is a 5-chromatic unit-distance graph of diameter ≤ 3 (the 510 graph has
+diameter 4.864). Radii 0.85 and below are 4-colorable; 0.875 and 0.9 are being settled.
+Decision: the doubled-origin test on the orbit union (1 h 47 min, no verdict) was stopped to
+free the core; the disc program is now the priority.
