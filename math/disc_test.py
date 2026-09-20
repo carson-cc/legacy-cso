@@ -18,5 +18,15 @@ for a,b in E2:
     if com:
         for c,u in enumerate((a,b,min(com))): cl.append([var(u,c)])
         break
-s=Cadical153(bootstrap_with=cl); s.conf_budget(budget); t=time.time(); r=s.solve_limited(); s.delete()
+solver=sys.argv[5] if len(sys.argv)>5 else "cadical"
+if solver=="glucose":
+    from pysat.solvers import Glucose4
+    s=Glucose4(bootstrap_with=cl); s.conf_budget(budget); t=time.time(); r=s.solve_limited(); pr=None; s.delete()
+else:
+    s=Cadical153(bootstrap_with=cl,with_proof=True); s.conf_budget(budget); t=time.time(); r=s.solve_limited()
+    pr=s.get_proof() if r is False else None; s.delete()
+if r is False and pr is not None:
+    tag="disc_%s_%g_%g"%(edgefile.split('/')[-1].split('.')[0],r_in,r_out)
+    open("notes/%s.cnf"%tag,"w").write("p cnf %d %d\n"%(m*k,len(cl))+"".join(" ".join(map(str,c))+" 0\n" for c in cl))
+    open("notes/%s.drat"%tag,"w").write("\n".join(pr)+"\n"); print("DRAT written: notes/%s.drat (%d lines)"%(tag,len(pr)),flush=True)
 print("annulus (%.3f, %.3f) of %s: |V|=%d |E|=%d  4-colorable: %s (%.0fs)"%(r_in,r_out,edgefile.split('/')[-1],m,len(E2),{True:'SAT',False:'UNSAT',None:'UNKNOWN'}[r],time.time()-t),flush=True)

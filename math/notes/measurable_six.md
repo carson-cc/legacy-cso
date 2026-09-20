@@ -434,3 +434,17 @@ disc of diameter one.
 - New finite test (disc_test.py): is the union unit-distance graph inside the punctured unit disc
   {δ < |x| < 1} 4-colorable? If not, finite-perimeter colorings cannot have tiles of diameter < δ
   (Lemma 5 + the punctured-neighborhood argument), forcing a locally finite map. Running.
+
+### Disc scan (translate union of the 510 graph, float edges; 06:40 UTC)
+| region | V | E | 4-colorable | time |
+|---|---|---|---|---|
+| |x| < 0.6 | 5904 | 6044 | SAT | 0 s |
+| |x| < 0.7 | 7938 | 17212 | SAT | 0 s |
+| |x| < 0.8 | 10184 | 32426 | SAT | 0 s |
+| |x| < 0.85 | 11488 | 42246 | SAT | 32 s |
+| |x| < 0.9 | 12820 | 52882 | UNKNOWN at 3M conflicts (1004 s); 40M-conflict run in progress |
+| 0.05/0.2 < |x| < 1, |x| < 1 | 15432 (for |x|<1) | | UNKNOWN at 900 s timeouts |
+For reference the 510 graph itself has circumradius 2.432 about its origin vertex and diameter 4.864.
+A 5-chromatic unit-distance graph inside a disc of radius 0.9 would be a large drop in diameter;
+the hardness jump between 0.85 and 0.9 is the thing to settle. If it is UNSAT, core_extract.py
+pulls a small subgraph out of the DRAT core and minimizes it.
