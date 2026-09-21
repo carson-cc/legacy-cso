@@ -1,7 +1,12 @@
 # Overnight summary (autonomous run, 2026-09-20 05:00–15:07 UTC) — FINAL
 
-## Headline
-A fully certified 5-chromatic unit-distance graph of diameter 2.296 (the 510-vertex graph has 4.864).
+## Headline (corrected 2026-09-21)
+NOT NEW: Polymath16 tracked the Euclidean radius of 5-chromatic unit-distance graphs (twelfth thread,
+March 2019, and the wiki's disc table); its record is below radius 1.10 (checked by the user on the
+Polymath pages, which this machine cannot reach). The certified chain below stands as a computation
+only. The reusable outcome is the method (notes/method_cube_and_conquer.md): cube-and-conquer with
+per-cube drat-trim-checked proofs, an independent cover check, and exact-geometry verification.
+Original (withdrawn) headline: a certified 5-chromatic unit-distance graph of diameter 2.296.
 Chain of certified versions, all subsets of the same exact point set (points p − g for vertices p, g of
 Heule's 510-vertex graph, coordinates in Q(√3,√11); exact edge set identical to the float edge set):
 | radius | vertices | edges | diameter | solver | proof | checker |
@@ -14,8 +19,8 @@ Heule's 510-vertex graph, coordinates in Q(√3,√11); exact edge set identical
 | 1.5 | 6344 | 39 962 | < 3 | CaDiCaL | 4 999 248 lines | VERIFIED |
 Radius 1.10 of the same set is 4-colorable (kissat SAT), so this set's threshold is in (1.10, 1.15].
 Files: notes/small5_r115_exact.txt (and r118, r1207, r1355, tr15, r15), *.SHA256 checksums; the
-CNF/DRAT files are regenerable (export_cnf.py + kissat, or exactify.py). Literature: nothing found on
-the minimum diameter of a 5-chromatic unit-distance graph; verify before claiming novelty.
+CNF/DRAT files are regenerable (export_cnf.py + kissat, or exactify.py). Literature: Polymath16's
+radius record for 5-chromatic graphs is below 1.10, so none of this is new (see Headline).
 
 ## The six mission: where it stands
 - Doubled-origin criteria (★0), (★), (★R): fail on every certified 5-chromatic graph available
@@ -43,8 +48,8 @@ G2347 and G3 were not run.
 Searches reachable from the sandbox (arXiv, ScienceDirect and the Polymath blogs are blocked by the
 proxy; only search summaries were available): Falconer 1981 (measurable ≥ 5), Polymath16 used a
 24-vertex "5-chromatic graph with a bichromatic origin" for measurable 5 and attempted 6; the ε-unit
-distance graph is known to need ≥ 6, and arXiv:2304.10163 claims ≥ 7 for a forbidden interval; nothing
-found on the minimum diameter of a 5-chromatic unit-distance graph. Verify before citing.
+distance graph is known to need ≥ 6, and arXiv:2304.10163 claims ≥ 7 for a forbidden interval.
+The radius of 5-chromatic graphs: Polymath16 threads 11, 12, 15 and the wiki disc table; record below 1.10.
 
 ## Files (math/)
 - notes/measurable_six.md: all lemmas (1–7), criteria (★0)/(★)/(★R), Program W, every run with numbers.
@@ -61,13 +66,15 @@ External inputs (not committed; cloned into the scratchpad): github.com/marijnhe
 github.com/Amberlogy/haugland-2131-certificates, github.com/marijnheule/drat-trim.
 
 ## Final state of the disc program
-|x| < 1.5 (translate union): 5-chromatic, certified (the headline). |x| ≤ 0.85: 4-colorable.
+|x| < 1.5 (translate union): 5-chromatic, certified; later 1.15 (see table); Polymath16 record is below 1.10. |x| ≤ 0.85: 4-colorable.
 0.93–1.46: undecided within budgets. Symmetry-closed sets at R = 1.0 (100 872 points) and 1.25
 (151 399) and the punctured unit disc: undecided after 4–5 h each with 20M-conflict budgets.
 
 ## What to do next (my recommendation)
-1. Literature check on the diameter result (minimum diameter of a 5-chromatic unit-distance graph);
-   if new, write it up with the certificate files (coordinates, cnf, drat, checksums, regeneration script).
+0. Lesson: check prior art before computing. The diameter line cost days of compute; the search that
+   showed Polymath16 had already gone below radius 1.10 took minutes. Pick targets only where an
+   authoritative source states the problem is open and gives the current record.
+1. (withdrawn) The diameter result is not new; keep only the method note.
 2. Program W (wild Townsend): get Townsend's paper, list its topological inputs, replace them with
    Lemmas 5–7 (tiles, close/far, shell exclusion). This is the route to "no measurable 5-coloring
    with finite-perimeter classes" and needs no SAT.
