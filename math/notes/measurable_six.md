@@ -607,3 +607,9 @@ unit and binary clauses) and confirms the cube set is exactly that list, so all-
 cc.py now writes a DRAT proof per cube and accepts a cube as UNSAT only after drat-trim prints VERIFIED.
 First 193 cubes: all UNSAT, mean 2.7 s per cube (max 100 s); the monolithic kissat run on the same CNF
 had been undecided after 3 h 20 min. Running on 3 cores; proof-free kissat on the same CNF on the 4th.
+- 02:50 UTC: pilots on the 87 875-point translate union (no minimisation) restricted to discs: radius 1.10
+  (18 348 vertices, 101 114 edges) — 5 of 6 pilot cubes UNSAT in 1–10 s, one undecided at 900 s;
+  radius 1.00 (15 431 vertices) — pilot cubes undecided at 900 s each. Decision (bounded push agreed with
+  the user): finish the radius-1.125 certificate, then run radius 1.10 on the big set with refinement
+  (16 split vertices, 9670 cubes, refinement to 20 split vertices, 28 778 cubes); the unit disc is parked.
+  The radius-1.125 run had hard cubes too (several > 600 s) — refinement handles them.
