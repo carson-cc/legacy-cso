@@ -597,3 +597,13 @@ cuber (cube_manual.py) and driver (cc.py) are in the repo for real hardware.
 State of the disc program: certified 5-chromatic at radius 1.15 (4341 vertices, diameter 2.296);
 4-colorable at radius 1.10 for the same set; everything at or below radius 1.10 that was tried is
 undecided within 4 h of single-core CDCL.
+
+### 02:30 UTC 09-21: cube-and-conquer changes the picture
+Manual cubing with a greedy dense-subgraph split (cube_manual.py: each split vertex maximises edges into
+pinned+chosen vertices; cubes = proper colourings of the induced subgraph) on the radius-1.125 subset of the
+certified set (4196 vertices, 20 272 edges, kis/r1125.cnf): 12 split vertices give 1688 cubes.
+cube_cover_check.py independently re-enumerates the admissible assignments (backtracking over the CNF's
+unit and binary clauses) and confirms the cube set is exactly that list, so all-cubes-UNSAT => UNSAT.
+cc.py now writes a DRAT proof per cube and accepts a cube as UNSAT only after drat-trim prints VERIFIED.
+First 193 cubes: all UNSAT, mean 2.7 s per cube (max 100 s); the monolithic kissat run on the same CNF
+had been undecided after 3 h 20 min. Running on 3 cores; proof-free kissat on the same CNF on the 4th.

@@ -23,10 +23,16 @@ for line in open(cnf):
     if t and t[0] not in ('p','c') and len(t)==2:
         lit=int(t[0]); units[(abs(lit)-1)//k]=(abs(lit)-1)%k if lit>0 else None
 pinned=[u for u,c in units.items() if c is not None]
-cand=[u for u in sorted(range(len(keep)),key=lambda u:-deg[u]) if u not in units][:s]
 adj={u:set() for u in range(len(keep))}
 for a,b in E2: adj[a].add(b); adj[b].add(a)
 fixed={u:c for u,c in units.items() if c is not None}
+# greedy: each new split vertex maximises edges into (pinned + chosen), tie-break by degree,
+# so the cubes are proper colourings of a dense induced subgraph rather than 4^s free choices.
+chosen=set(fixed); cand=[]
+for _ in range(s):
+    best=max((u for u in range(len(keep)) if u not in chosen and u not in units),
+             key=lambda u:(len(adj[u]&chosen),deg[u]))
+    cand.append(best); chosen.add(best)
 cubes=[]
 for cols in itertools.product(range(k),repeat=len(cand)):
     asg=dict(fixed); asg.update(zip(cand,cols)); ok=True
