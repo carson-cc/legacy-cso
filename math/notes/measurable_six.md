@@ -613,3 +613,21 @@ had been undecided after 3 h 20 min. Running on 3 cores; proof-free kissat on th
   the user): finish the radius-1.125 certificate, then run radius 1.10 on the big set with refinement
   (16 split vertices, 9670 cubes, refinement to 20 split vertices, 28 778 cubes); the unit disc is parked.
   The radius-1.125 run had hard cubes too (several > 600 s) — refinement handles them.
+
+### 03:30 UTC 09-21: PRIOR ART on small-radius 5-chromatic graphs (correction of the novelty claim)
+Web-search summaries (the Polymath pages themselves are blocked from this machine) show that the radius
+of 5-chromatic unit-distance graphs was an explicit Polymath16 target:
+- Polymath16 twelfth thread (Mixon, 23 Mar 2019): a 745-vertex graph of J. Harder forces every vertex at
+  distance 8/3 from the origin to share the origin's colour under 4-colourings (spindling then gives a
+  5-chromatic graph); it was reduced to a 547-vertex symmetric graph; graphs with the same property at
+  other distances give "rather compact graphs in the sense of Euclidean radius", and "the previous record
+  of radius for 5-chromatic graphs was at least 2".
+- Polymath16 eleventh thread (Sep 2018) and the wiki section on chromatic numbers of planar sets track
+  the largest known k-colourable discs (4-colourable up to radius 0.869; 5-colourable up to 1.1, later
+  1.158086135 in thread 15) and, by the same token, the smallest disc known to contain a 5-chromatic graph.
+Consequences: the statement "5-chromatic graphs of diameter under 2.3 are new" in earlier RESULT entries
+is withdrawn. The quantity was studied by Polymath16 with an explicit record that I could not read (it is
+below radius 2 as of March 2019; the exact value is on the Polymath wiki / thread 12 comments). Whether
+radius 1.15 (or 1.125 / 1.10, if certified) improves that record is unknown from here and must be checked
+against the wiki before any claim is made. The certificates stand as computations; the novelty does not.
+Lesson recorded: check prior art before computing; the search that surfaced this took minutes.
