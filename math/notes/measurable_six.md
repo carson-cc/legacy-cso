@@ -588,3 +588,12 @@ Threshold of this set now in (1.10, 1.15]; radius 1.125 running.
   verdict unknown. Bracketing stops here: certified threshold interval (1.10, 1.15]. Deleted the
   proofs of SAT/unknown runs; the verified proofs (r115, r118, r1207, r1355, tr15, r15) are kept
   and checksummed.
+
+### 01:30 UTC 09-21: pushing below radius 1.15 (all undecided)
+kissat, 3.9 h each, all UNKNOWN: symmetry-closed sets at R = 1.05 (110 220 pts) and 1.10 (119 220 pts);
+translate union of the 553-vertex graph at R = 1.10 and 1.15. march_cu (built from marijnheule/CnC with
+-fcommon) cubes small instances but crashes/stalls on the 400k-variable unit-disc instance; a manual
+cuber (cube_manual.py) and driver (cc.py) are in the repo for real hardware.
+State of the disc program: certified 5-chromatic at radius 1.15 (4341 vertices, diameter 2.296);
+4-colorable at radius 1.10 for the same set; everything at or below radius 1.10 that was tried is
+undecided within 4 h of single-core CDCL.
