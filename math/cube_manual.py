@@ -34,13 +34,13 @@ for _ in range(s):
              key=lambda u:(len(adj[u]&chosen),deg[u]))
     cand.append(best); chosen.add(best)
 cubes=[]
-for cols in itertools.product(range(k),repeat=len(cand)):
-    asg=dict(fixed); asg.update(zip(cand,cols)); ok=True
-    for u in cand:
-        for w in adj[u]:
-            if w in asg and asg[w]==asg[u]: ok=False; break
-        if not ok: break
-    if ok: cubes.append([var(u,asg[u]) for u in cand])
+def rec(i,asg):
+    if i==len(cand): cubes.append([var(u,asg[u]) for u in cand]); return
+    u=cand[i]
+    for c in range(k):
+        if all(asg.get(w)!=c for w in adj[u]):
+            asg[u]=c; rec(i+1,asg); del asg[u]
+rec(0,dict(fixed))
 with open(out,"w") as f:
     for c in cubes: f.write("a "+" ".join(map(str,c))+" 0\n")
 print("split vertices %s (degrees %s); cubes: %d"%(cand,[deg[u] for u in cand],len(cubes)))
